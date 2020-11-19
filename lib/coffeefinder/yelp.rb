@@ -6,27 +6,26 @@ require 'graphlient'
 
 module Coffeefinder
   class Yelp
+    attr_accessor :results
     def initialize
       self.client = self.class.create_client
-      self.variables = { cursor: cursor }
+      self.variables = { results: results }
     end
 
     def query(query_type)
       case query_type
       when 'nearby'
+        puts 'Looking for nearby coffee shops...'
+        variables[:results] = results
         variables[:latitude] = latitude
         variables[:longitude] = longitude
-        self.data = client.query(nearby_query, variables)
-      when 'nearby_with_cursor'
-        variables[:latitude] = latitude
-        variables[:longitude] = longitude
-        variables[:cursor] = cursor
-        self.data = client.query(nearby_query_with_cursor, variables)
+        self.data = client.query(Query.nearby, variables)
       end
       data
     end
 
     def self.create_client
+      puts 'Authenticating with Yelp...'
       client = Graphlient::Client.new(YELP_API,
                                       headers: {
                                         'Authorization' => "Bearer #{API_KEY}"
