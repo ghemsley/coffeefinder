@@ -3,5 +3,7 @@ require 'coffeefinder/constants'
 
 module Coffeefinder
   class Error < StandardError; end
-  location = GeoIP.new
+  cli = CLI.new
+  yelp = Yelp.new
+
 end

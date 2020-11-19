@@ -2,20 +2,25 @@ require 'optparse'
 require 'coffeefinder/constants'
 module Coffeefinder
   class CLI
-    attr_reader :options
+    attr_reader :options, :results, :radius, :ip_address
 
     def initialize
       self.options = {}
       create_option_parser
       self.results = options[:results] || 20
-      puts "Performing geolocation lookup for IP #{ip}..." if options[:ip]
+      self.radius = options[:radius] || 1000
+      self.ip_address = options[:ip_address] || nil
+      puts "Performing geolocation lookup for IP #{ip_address}..." if options[:ip]
     end
 
     def create_option_parser
       OptionParser.new do |opts|
         opts.banner = 'Usage: coffeefinder [options]'
         opts.on('-I', '--IP STRING', 'IP address to use for geolocation lookup') do |ip|
-          options[:ip] = ip.to_s
+          options[:ip] = ip.to_s if ip
+        end
+        opts.on('-r', '--radius INTEGER', 'How big of an area to search, in meters') do |radius|
+          options[:radius] = results.to_i if radius
         end
         opts.on('-R', '--RESULTS INTEGER', 'How many results to show at once') do |results|
           options[:results] = results.to_i if results
@@ -63,6 +68,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :options
+    attr_writer :options, :results, :radius, :ip_address
   end
 end
