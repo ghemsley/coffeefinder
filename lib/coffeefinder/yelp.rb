@@ -6,19 +6,24 @@ require 'graphlient'
 
 module Coffeefinder
   class Yelp
-    attr_accessor :results
-    def initialize
+    attr_accessor :latitude, :longitude, :radius, :results
+    attr_reader :variables
+    def initialize(latitude = 42.0307, longitude = -87.8107, radius = 500.0, results = 10)
       self.client = self.class.create_client
-      self.variables = { results: results }
+      self.latitude = latitude
+      self.longitude = longitude
+      self.radius = radius
+      self.variables = { results: results, latitude: latitude, longitude: longitude }
     end
 
     def query(query_type)
       case query_type
       when 'nearby'
         puts 'Looking for nearby coffee shops...'
-        variables[:results] = results
         variables[:latitude] = latitude
         variables[:longitude] = longitude
+        variables[:radius] = radius
+        variables[:results] = results
         self.data = client.query(Query.nearby, variables)
       end
       data
@@ -35,5 +40,9 @@ module Coffeefinder
                                       })
       client
     end
+
+    private
+
+    attr_writer :variables
   end
 end

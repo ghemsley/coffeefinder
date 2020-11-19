@@ -2,25 +2,26 @@ require 'optparse'
 require 'coffeefinder/constants'
 module Coffeefinder
   class CLI
+    attr_accessor :yelp, :geoip
     attr_reader :options, :results, :radius, :ip_address
 
     def initialize
       self.options = {}
       create_option_parser
       self.results = options[:results] || 20
-      self.radius = options[:radius] || 1000
-      self.ip_address = options[:ip_address] || nil
+      self.radius = options[:radius] || 500.0
+      self.ip_address = options[:ip_address] || ''
       puts "Performing geolocation lookup for IP #{ip_address}..." if options[:ip]
     end
 
     def create_option_parser
       OptionParser.new do |opts|
         opts.banner = 'Usage: coffeefinder [options]'
-        opts.on('-I', '--IP STRING', 'IP address to use for geolocation lookup') do |ip|
-          options[:ip] = ip.to_s if ip
+        opts.on('-I', '--IP IP_ADDRESS', 'IP address to use for geolocation lookup') do |ip|
+          options[:ip_address] = ip.to_s if ip
         end
-        opts.on('-r', '--radius INTEGER', 'How big of an area to search, in meters') do |radius|
-          options[:radius] = results.to_i if radius
+        opts.on('-r', '--radius FLOAT', 'How big of an area to search, in meters') do |radius|
+          options[:radius] = radius.to_f if radius
         end
         opts.on('-R', '--RESULTS INTEGER', 'How many results to show at once') do |results|
           options[:results] = results.to_i if results
@@ -36,7 +37,7 @@ module Coffeefinder
       end.parse!
     end
 
-    def search_nearby(yelp)
+    def search_nearby
       yelp.query('nearby')
       data = yelp.data
       print "Press enter to list nearby coffee shops, or press q at any time to quit:\n"

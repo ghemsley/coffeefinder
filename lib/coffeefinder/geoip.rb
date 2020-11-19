@@ -4,7 +4,6 @@ require 'json'
 
 module Coffeefinder
   class GeoIP
-    @@all = []
     attr_accessor :ip_address
     attr_reader :response, :data, :status, :country_code, :country,
                 :region, :region_name, :city, :zip, :latitude, :longitude
@@ -13,7 +12,6 @@ module Coffeefinder
       self.response = Net::HTTP.get_response(GEOIP_API + self.ip_address)
       self.data = JSON.parse(response)
       data_to_attributes
-      self.class.all.push(self)
     end
 
     private
