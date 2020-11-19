@@ -8,7 +8,7 @@ module Coffeefinder
     def initialize
       self.options = {}
       create_option_parser
-      self.results = options[:results] || 20
+      self.results = options[:results] || 10
       self.radius = options[:radius] || 500.0
       self.ip_address = options[:ip_address] || ''
       puts "Performing geolocation lookup for IP #{ip_address}..." if options[:ip]

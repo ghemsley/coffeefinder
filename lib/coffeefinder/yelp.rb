@@ -9,11 +9,13 @@ module Coffeefinder
     attr_accessor :latitude, :longitude, :radius, :results
     attr_reader :variables
     def initialize(latitude = 42.0307, longitude = -87.8107, radius = 500.0, results = 10)
+      puts 'Authenticating with Yelp...'
       self.client = self.class.create_client
       self.latitude = latitude
       self.longitude = longitude
       self.radius = radius
-      self.variables = { results: results, latitude: latitude, longitude: longitude }
+      self.results = results
+      self.variables = { latitude: latitude, longitude: longitude, radius: radius, results: results }
     end
 
     def query(query_type)

@@ -9,6 +9,7 @@ module Coffeefinder
                 :region, :region_name, :city, :zip, :latitude, :longitude
     def initialize(ip_address = '')
       self.ip_address = ip_address.to_s
+      puts "Obtaining geolocation data for IP address #{self.ip_address}"
       self.response = Net::HTTP.get_response(GEOIP_API + self.ip_address)
       self.data = JSON.parse(response)
       data_to_attributes
