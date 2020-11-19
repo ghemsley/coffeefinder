@@ -1,3 +1,0 @@
-module Coffeefinder
-  
-end

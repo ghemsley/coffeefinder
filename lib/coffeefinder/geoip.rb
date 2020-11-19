@@ -1,3 +1,4 @@
+require 'coffeefinder/constants'
 require 'net/http'
 require 'json'
 
@@ -9,7 +10,7 @@ module Coffeefinder
                 :region, :region_name, :city, :zip, :latitude, :longitude
     def initialize(ip_address = '')
       self.ip_address = ip_address.to_s
-      self.response = Net::HTTP.get_response("http://ip-api.com/json/#{self.ip_address}")
+      self.response = Net::HTTP.get_response(GEOIP_API + self.ip_address)
       self.data = JSON.parse(response)
       data_to_attributes
       self.class.all.push(self)
