@@ -7,15 +7,15 @@ require 'graphlient'
 module Coffeefinder
   class Yelp
     attr_accessor :latitude, :longitude, :radius, :results
-    attr_reader :variables
-    def initialize(latitude = 42.0307, longitude = -87.8107, radius = 500.0, results = 10)
+    attr_reader :variables, :data
+    def initialize(latitude = 42.0307, longitude = -87.8107, radius = 500.0, limit = 10)
       puts 'Authenticating with Yelp...'
       self.client = self.class.create_client
       self.latitude = latitude
       self.longitude = longitude
       self.radius = radius
-      self.results = results
-      self.variables = { latitude: latitude, longitude: longitude, radius: radius, results: results }
+      self.limit = limit
+      self.variables = { latitude: latitude, longitude: longitude, radius: radius, limit: limit }
     end
 
     def query(query_type)
@@ -26,7 +26,7 @@ module Coffeefinder
         variables[:longitude] = longitude
         variables[:radius] = radius
         variables[:results] = results
-        self.data = client.query(Query.nearby, variables)
+        self.data = client.query(Query.nearby, variables).data
       end
       data
     end
@@ -45,6 +45,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :variables
+    attr_writer :variables, :data
   end
 end

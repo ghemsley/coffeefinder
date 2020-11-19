@@ -2,8 +2,8 @@ module Coffeefinder
   class Query
     def self.nearby
       <<~GRAPHQL
-        query ($latitude: Float, $longitude: Float, $radius: Float) {
-          search(term: "coffee", latitude: $latitude, longitude: $longitude, radius: $radius) {
+        query ($latitude: Float, $longitude: Float, $radius: Float, $limit: Int) {
+          search(term: "coffee", latitude: $latitude, longitude: $longitude, radius: $radius, limit: $limit) {
             total
             business {
               name
