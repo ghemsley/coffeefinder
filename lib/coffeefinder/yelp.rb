@@ -6,26 +6,37 @@ require 'graphlient'
 
 module Coffeefinder
   class Yelp
-    attr_accessor :latitude, :longitude, :radius, :results
-    attr_reader :variables, :data
-    def initialize(latitude = 42.0307, longitude = -87.8107, radius = 500.0, limit = 10)
-      puts 'Authenticating with Yelp...'
+    attr_accessor :latitude, :longitude, :radius, :limit, :sort_by
+    attr_reader :variables, :data, :client
+    def initialize(latitude = 42.0307, longitude = -87.8107, radius = 500.0, limit = 10, sort_by = 'best_match')
       self.client = self.class.create_client
       self.latitude = latitude
       self.longitude = longitude
       self.radius = radius
       self.limit = limit
-      self.variables = { latitude: latitude, longitude: longitude, radius: radius, limit: limit }
+      self.sort_by = sort_by
+      self.variables = {
+        latitude: self.latitude,
+        longitude: self.longitude,
+        radius: self.radius,
+        limit: self.limit,
+        sort_by: self.sort_by
+      }
+    end
+
+    def update_variables
+      variables[:latitude] = latitude
+      variables[:longitude] = longitude
+      variables[:radius] = radius
+      variables[:limit] = limit
+      variables[:sort_by] = sort_by
     end
 
     def query(query_type)
       case query_type
       when 'nearby'
         puts 'Looking for nearby coffee shops...'
-        variables[:latitude] = latitude
-        variables[:longitude] = longitude
-        variables[:radius] = radius
-        variables[:results] = results
+        update_variables
         self.data = client.query(Query.nearby, variables).data
       end
       data
@@ -45,6 +56,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :variables, :data
+    attr_writer :variables, :data, :client
   end
 end

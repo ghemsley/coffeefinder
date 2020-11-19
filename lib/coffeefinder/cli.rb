@@ -3,7 +3,7 @@ require 'coffeefinder/constants'
 module Coffeefinder
   class CLI
     attr_accessor :yelp, :geoip
-    attr_reader :options, :limit, :radius, :ip_address
+    attr_reader :options, :limit, :radius, :ip_address, :sort_by
 
     def initialize
       self.options = {}
@@ -11,6 +11,7 @@ module Coffeefinder
       self.limit = options[:limit] || 10
       self.radius = options[:radius] || 500.0
       self.ip_address = options[:ip_address] || ''
+      self.sort_by = options[:sort_by] || 'best_match'
       puts "Performing geolocation lookup for IP #{ip_address}..." if options[:ip]
     end
 
@@ -25,6 +26,9 @@ module Coffeefinder
         end
         opts.on('-l', '--limit INTEGER', 'How many results to show at once') do |limit|
           options[:limit] = limit.to_i
+        end
+        opts.on('-S', '--SORT_BY STRING', "How to sort results. Acceptable values: 'distance', 'rating', 'review_count', 'best_match'") do |sort_by|
+          options[:sort_by] = sort_by.to_s
         end
         opts.on('-v', '--version', 'Display the program version. Overrides all other option behaviors') do
           puts VERSION
@@ -62,6 +66,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :options, :results, :radius, :ip_address
+    attr_writer :options, :limit, :radius, :ip_address, :sort_by
   end
 end
