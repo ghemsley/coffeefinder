@@ -41,25 +41,34 @@ module Coffeefinder
       end.parse!
     end
 
+    def spaces(count)
+      string = ''
+      (3 - (Math.log10(count).to_i + 1)).times do
+        string << ' '
+      end
+      string
+    end
+
     def search_nearby
+      puts "Press enter to list nearby coffee shops, or press q at any time to quit:\n"
+      input = gets.chomp.strip.downcase
+      count = 1
       yelp.query('nearby')
       data = yelp.data
-      print "Press enter to list nearby coffee shops, or press q at any time to quit:\n"
-      input = gets.chomp.strip.downcase
-      count = 0
-      while input != 'q' && count < data.search.total
+      puts "Total nearby coffee shops: #{data.search.total}\n\n"
+      while input != 'q' && count <= data.search.total && (data.search.total > yelp.limit || count < data.search.total)
         data.search.business.each do |business|
-          puts "#{count + 1}#{case count
-                              when count < 10
-                                print ''
-                              when count > 9
-                                print ' '
-                              when count > 99
-                                print '  '
-                              end
-                            }| #{business.name}"
+          puts "#{count}#{spaces(count)}| #{business.name}"
           count += 1
         end
+        next unless count < data.search.total && data.search.total > yelp.limit
+
+        puts "\nPress enter to list more nearby coffee shops, or press q at any time to quit:\n"
+        input = gets.chomp.strip.downcase
+        yelp.offset = count
+        yelp.update_variables
+        yelp.query('nearby')
+        data = yelp.data
       end
       # rescue NoMethodError || NameError
     end
