@@ -1,6 +1,7 @@
-require "coffeefinder/version"
+require 'coffeefinder/cli'
+require 'coffeefinder/constants'
 
 module Coffeefinder
   class Error < StandardError; end
-  # Your code goes here...
+  location = GeoIP.new
 end

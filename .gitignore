@@ -1,5 +1,5 @@
 # ignore personal access token
-
+lib/coffeefinder/secrets.rb
 
 # Bundler
 /.bundle/
