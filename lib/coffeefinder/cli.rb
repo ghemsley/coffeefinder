@@ -73,13 +73,17 @@ module Coffeefinder
       string
     end
 
-    def search_nearby(strict)
-      puts "Press enter to list nearby coffee shops, or press q at any time to quit:\n"
+    def get_nearby_query_data
+      strict ? yelp.query('nearby_strict') : yelp.query('nearby')
+      yelp.data
+    end
+
+    def search_nearby
+      puts "Press enter to list nearby coffee shops, or type q to quit:\n"
       input = gets.chomp.strip.downcase
       count = 1
       puts "Looking for nearby coffee shops...\n\n"
-      strict ? yelp.query('nearby_strict') : yelp.query('nearby')
-      data = yelp.data
+      data = get_nearby_query_data
       puts "Total nearby coffee shops: #{data.search.total}\n\n"
       while input != 'q' && count <= data.search.total && (data.search.total > yelp.limit || count < data.search.total)
         data.search.business.each do |business_object|
@@ -90,20 +94,21 @@ module Coffeefinder
         next unless count < data.search.total && data.search.total > yelp.limit
 
         until (input == instance_of?(Integer) && number <= count && number.positive?) || input == "\n"
-          puts "\nPress enter to list more nearby coffee shops, type a number to view a certain business, or press q at any time to quit:\n"
+          puts "\nPress enter to list more nearby coffee shops, type a number to view a certain business, or type q to quit:\n"
           input = gets.chomp.strip.downcase
           if input.instance_of?(Integer)
             display_business(input)
           elsif input == "\n"
             yelp.offset = count
             yelp.update_variables
-            strict ? yelp.query('nearby_strict') : yelp.query('nearby')
-            data = yelp.data
+            data = get_nearby_query_data
           else
             puts 'Your input seems to be invalid, please try again.'
           end
         end
+        puts 'Enter a number to view the corresponding business, or type q to quit: '
       end
+
       # rescue NoMethodError || NameError
     end
 
