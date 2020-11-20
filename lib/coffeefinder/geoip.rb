@@ -10,12 +10,8 @@ module Coffeefinder
     def initialize(ip_address = '')
       self.ip_address = ip_address.to_s
       self.response = Net::HTTP.get_response(URI(GEOIP_API + self.ip_address))
-      self.data = self.class.symbolize_hash(JSON.parse(response.body))
+      self.data = JSON.parse(response.body).transform_keys!(&:to_sym)
       data_to_attributes
-    end
-
-    def self.symbolize_hash(hash)
-      hash.transform_keys!(&:to_sym)
     end
 
     private

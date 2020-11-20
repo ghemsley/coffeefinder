@@ -1,8 +1,9 @@
 require 'optparse'
 require 'coffeefinder/constants'
+require 'coffeefinder/business'
 module Coffeefinder
   class CLI
-    attr_reader :yelp, :geoip, :options, :limit, :radius, :ip_address, :sort_by
+    attr_reader :yelp, :geoip, :options, :limit, :radius, :ip_address, :sort_by, :strict
 
     def initialize
       self.options = {}
@@ -11,6 +12,7 @@ module Coffeefinder
       self.radius = options[:radius] || 500.0
       self.ip_address = options[:ip_address] || ''
       self.sort_by = options[:sort_by] || 'best_match'
+      self.strict = options[:strict] || false
     end
 
     def geoip=(geoip)
@@ -46,8 +48,11 @@ module Coffeefinder
         opts.on('-l', '--limit INTEGER', 'How many results to show at once') do |limit|
           options[:limit] = limit.to_i
         end
-        opts.on('-S', '--SORT_BY STRING', "How to sort results. Acceptable values: 'distance', 'rating', 'review_count', 'best_match'") do |sort_by|
+        opts.on('-s', '--sort_by STRING', "How to sort results. Acceptable values: 'distance', 'rating', 'review_count', 'best_match'") do |sort_by|
           options[:sort_by] = sort_by.to_s
+        end
+        opts.on('-S', '--STRICT', 'Use a stricter search method. Less results but also less false positives.') do
+          options[:strict] = true
         end
         opts.on('-v', '--version', 'Display the program version. Overrides all other option behaviors') do
           puts VERSION
@@ -68,16 +73,17 @@ module Coffeefinder
       string
     end
 
-    def search_nearby
+    def search_nearby(strict)
       puts "Press enter to list nearby coffee shops, or press q at any time to quit:\n"
       input = gets.chomp.strip.downcase
       count = 1
       puts "Looking for nearby coffee shops...\n\n"
-      yelp.query('nearby')
+      strict ? yelp.query('nearby_strict') : yelp.query('nearby')
       data = yelp.data
       puts "Total nearby coffee shops: #{data.search.total}\n\n"
       while input != 'q' && count <= data.search.total && (data.search.total > yelp.limit || count < data.search.total)
-        data.search.business.each do |business|
+        data.search.business.each do |business_object|
+          business = Business.new(business_object)
           puts "#{count}#{spaces(count)}| #{business.name}"
           count += 1
         end
@@ -87,7 +93,7 @@ module Coffeefinder
         input = gets.chomp.strip.downcase
         yelp.offset = count
         yelp.update_variables
-        yelp.query('nearby')
+        strict ? yelp.query('nearby_strict') : yelp.query('nearby')
         data = yelp.data
       end
       # rescue NoMethodError || NameError
@@ -95,6 +101,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :options, :limit, :radius, :ip_address, :sort_by
+    attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict
   end
 end

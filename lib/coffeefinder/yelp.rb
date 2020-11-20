@@ -7,28 +7,17 @@ module Coffeefinder
   class Yelp
     attr_accessor :latitude, :longitude, :radius, :limit, :sort_by, :offset
     attr_reader :variables, :data, :client
-    def initialize(
-      latitude: 42.0307,
-      longitude: -87.8107,
-      radius: 500.0,
-      limit: 10,
-      sort_by: 'best_match',
-      offset: 0
-    )
+    def initialize(args = { latitude: 42.0307,
+                            longitude: -87.8107,
+                            radius: 500.0,
+                            limit: 10,
+                            sort_by: 'best_match',
+                            offset: 0 })
       self.client = self.class.create_client
-      self.latitude = latitude
-      self.longitude = longitude
-      self.radius = radius
-      self.limit = limit
-      self.sort_by = sort_by
-      self.offset = offset
-      self.variables = {
-        latitude: self.latitude,
-        longitude: self.longitude,
-        radius: self.radius,
-        limit: self.limit,
-        sort_by: self.sort_by
-      }
+      args.each do |key, value|
+        send("#{key}=", value)
+      end
+      self.variables = { latitude: latitude, longitude: longitude, radius: radius, limit: limit, sort_by: sort_by }
     end
 
     def update_variables
@@ -45,6 +34,9 @@ module Coffeefinder
       when 'nearby'
         update_variables
         self.data = client.query(Query.nearby, variables).data
+      when 'nearby_strict'
+        update_variables
+        self.data = client.query(Query.nearby_strict, variables).data
       end
       data
     end
@@ -63,5 +55,6 @@ module Coffeefinder
     private
 
     attr_writer :variables, :data, :client
+
   end
 end
