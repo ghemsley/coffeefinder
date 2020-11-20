@@ -107,6 +107,24 @@ module Coffeefinder
       # rescue NoMethodError || NameError
     end
 
+    def display_business(number)
+      business = Business.all.find do |business_object|
+        business_object.number == number
+      end
+      puts <<~STRING
+        #{business.number}#{spaces(number)}| Name: #{business.name}
+        #{spaces(number)}  Url: #{business.url}
+        #{spaces(number)}  Rating: #{business.rating}
+        #{spaces(number)}  Reviews: #{business.review_count}
+        #{spaces(number)}  Distance: #{business.distance}
+        #{spaces(number)}  Price range: #{business.price}
+        #{spaces(number)}  Phone: #{business.phone}
+        #{spaces(number)}  Address: #{business.address}
+        #{spaces(number)}  City: #{business.city}
+        #{spaces(number)}  Open now: #{business.open_now ? 'Yes' : 'No'}
+      STRING
+    end
+
     private
 
     attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict
