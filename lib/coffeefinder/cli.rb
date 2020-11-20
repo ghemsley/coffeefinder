@@ -2,8 +2,7 @@ require 'optparse'
 require 'coffeefinder/constants'
 module Coffeefinder
   class CLI
-    attr_accessor :yelp, :geoip
-    attr_reader :options, :limit, :radius, :ip_address, :sort_by
+    attr_reader :yelp, :geoip, :options, :limit, :radius, :ip_address, :sort_by
 
     def initialize
       self.options = {}
@@ -12,12 +11,32 @@ module Coffeefinder
       self.radius = options[:radius] || 500.0
       self.ip_address = options[:ip_address] || ''
       self.sort_by = options[:sort_by] || 'best_match'
-      puts "Performing geolocation lookup for IP #{ip_address}..." if options[:ip]
+    end
+
+    def geoip=(geoip)
+      puts "Obtaining geolocation data for IP address#{ip_address != '' ? " #{ip_address}" : ''}..."
+      @geoip = geoip
+    end
+
+    def yelp=(yelp)
+      puts 'Authenticating with Yelp...'
+      @yelp = yelp
     end
 
     def create_option_parser
       OptionParser.new do |opts|
-        opts.banner = 'Usage: coffeefinder [options]'
+        opts.banner = <<~BANNER
+
+                      ( (
+                      ) )
+                    ........
+                    |      | ]
+                    \\      /
+                     `----'
+
+          Usage: coffeefinder [options]
+
+        BANNER
         opts.on('-I', '--IP IP_ADDRESS', 'IP address to use for geolocation lookup') do |ip|
           options[:ip_address] = ip.to_s
         end
@@ -53,6 +72,7 @@ module Coffeefinder
       puts "Press enter to list nearby coffee shops, or press q at any time to quit:\n"
       input = gets.chomp.strip.downcase
       count = 1
+      puts "Looking for nearby coffee shops...\n\n"
       yelp.query('nearby')
       data = yelp.data
       puts "Total nearby coffee shops: #{data.search.total}\n\n"

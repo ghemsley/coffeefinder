@@ -1,7 +1,6 @@
 require 'coffeefinder/secrets'
 require 'coffeefinder/constants'
 require 'coffeefinder/query'
-require 'coffeefinder/geoip'
 require 'graphlient'
 
 module Coffeefinder
@@ -44,7 +43,6 @@ module Coffeefinder
     def query(query_type)
       case query_type
       when 'nearby'
-        puts "Looking for nearby coffee shops...\n\n"
         update_variables
         self.data = client.query(Query.nearby, variables).data
       end
@@ -52,7 +50,6 @@ module Coffeefinder
     end
 
     def self.create_client
-      puts 'Authenticating with Yelp...'
       client = Graphlient::Client.new(YELP_API,
                                       headers: {
                                         'Authorization' => "Bearer #{API_KEY}"
