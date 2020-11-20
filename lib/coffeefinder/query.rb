@@ -3,17 +3,22 @@ module Coffeefinder
     def self.nearby
       <<~GRAPHQL
         query ($latitude: Float, $longitude: Float, $radius: Float, $limit: Int, $sort_by: String, $offset: Int) {
-          search(term: "coffee", latitude: $latitude, longitude: $longitude, radius: $radius, limit: $limit, sort_by: $sort_by, offset: $offset) {
+          search(categories: "coffee", latitude: $latitude, longitude: $longitude, radius: $radius, limit: $limit, sort_by: $sort_by, offset: $offset) {
             total
             business {
               name
               rating
               review_count
+              distance
+              price
+              url
+              phone
+              hours {
+                is_open_now
+              }
               location {
                 address1
                 city
-                state
-                country
               }
             }
           }

@@ -60,9 +60,9 @@ module Coffeefinder
       end.parse!
     end
 
-    def spaces(count)
+    def spaces(iteration_count)
       string = ''
-      (3 - (Math.log10(count).to_i + 1)).times do
+      (3 - (Math.log10(iteration_count).to_i + 1)).times do
         string << ' '
       end
       string
