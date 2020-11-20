@@ -1,8 +1,9 @@
 class Business
   @@all = []
-  attr_reader :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city, :photo
+  attr_reader :number, :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city, :photo
 
-  def initialize(business)
+  def initialize(business, number)
+    self.number = number
     self.id = business.id if business.id
     self.name = business.name if business.name
     self.rating = business.rating if business.rating
@@ -21,5 +22,5 @@ class Business
     @@all
   end
 
-  attr_writer :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city, :photo
+  attr_writer :number, :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city, :photo
 end

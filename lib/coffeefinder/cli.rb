@@ -83,18 +83,26 @@ module Coffeefinder
       puts "Total nearby coffee shops: #{data.search.total}\n\n"
       while input != 'q' && count <= data.search.total && (data.search.total > yelp.limit || count < data.search.total)
         data.search.business.each do |business_object|
-          business = Business.new(business_object)
+          business = Business.new(business_object, count)
           puts "#{count}#{spaces(count)}| #{business.name}"
           count += 1
         end
         next unless count < data.search.total && data.search.total > yelp.limit
 
-        puts "\nPress enter to list more nearby coffee shops, or press q at any time to quit:\n"
-        input = gets.chomp.strip.downcase
-        yelp.offset = count
-        yelp.update_variables
-        strict ? yelp.query('nearby_strict') : yelp.query('nearby')
-        data = yelp.data
+        until (input == instance_of?(Integer) && number <= count && number.positive?) || input == "\n"
+          puts "\nPress enter to list more nearby coffee shops, type a number to view a certain business, or press q at any time to quit:\n"
+          input = gets.chomp.strip.downcase
+          if input.instance_of?(Integer)
+            display_business(input)
+          elsif input == "\n"
+            yelp.offset = count
+            yelp.update_variables
+            strict ? yelp.query('nearby_strict') : yelp.query('nearby')
+            data = yelp.data
+          else
+            puts 'Your input seems to be invalid, please try again.'
+          end
+        end
       end
       # rescue NoMethodError || NameError
     end
