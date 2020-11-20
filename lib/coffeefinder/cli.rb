@@ -120,12 +120,18 @@ module Coffeefinder
         data.search.business.each do |business_object|
           business = Business.new(business_object)
           puts "#{count + 1}#{inverse_spaces(count + 1, data.search.total)}| #{business.name}"
-          puts "#{spaces(data.search.total)}| - About #{business.distance >= 1000 ? "#{business.distance / 1000} km away" : "#{business.distance.to_i} meters away"}"
+          puts "#{spaces(data.search.total)}| - About #{if business.distance >= 1000
+                                                          "#{(business.distance / 1000).truncate(2)} km away"
+                                                        else
+                                                          "#{business.distance.to_i} meters away"
+                                                        end}"
           count += 1
         end
         break unless count < data.search.total
+
         continue = prompt.yes?('Show more results?')
         break unless continue
+
         yelp.offset = count
         get_nearby_query_data
       end
