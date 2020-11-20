@@ -10,7 +10,8 @@ module Coffeefinder
                         longitude: cli.geoip.longitude,
                         radius: cli.radius,
                         limit: cli.limit,
-                        sort_by: cli.sort_by
+                        sort_by: cli.sort_by,
+                        offset: 0
                       })
-  cli.search_nearby(cli.options[:strict])
+  cli.main_menu
 end

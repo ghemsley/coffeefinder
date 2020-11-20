@@ -2,8 +2,7 @@ class Business
   @@all = []
   attr_reader :number, :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city, :photo
 
-  def initialize(business, number)
-    self.number = number
+  def initialize(business)
     self.id = business.id if business.id
     self.name = business.name if business.name
     self.rating = business.rating if business.rating

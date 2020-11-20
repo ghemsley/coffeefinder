@@ -1,9 +1,10 @@
 require 'optparse'
 require 'coffeefinder/constants'
 require 'coffeefinder/business'
+require 'tty-prompt'
 module Coffeefinder
   class CLI
-    attr_reader :yelp, :geoip, :options, :limit, :radius, :ip_address, :sort_by, :strict
+    attr_reader :yelp, :geoip, :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data
 
     def initialize
       self.options = {}
@@ -12,17 +13,22 @@ module Coffeefinder
       self.radius = options[:radius] || 500.0
       self.ip_address = options[:ip_address] || ''
       self.sort_by = options[:sort_by] || 'best_match'
-      self.strict = options[:strict] || false
+      self.strict = true
+      self.prompt = TTY::Prompt.new
     end
 
     def geoip=(geoip)
-      puts "Obtaining geolocation data for IP address#{ip_address != '' ? " #{ip_address}" : ''}..."
+      print "Obtaining geolocation data for IP address#{ip_address != '' ? " #{ip_address}" : ''}... "
       @geoip = geoip
+      print "Obtained!\n"
+      self.geoip
     end
 
     def yelp=(yelp)
-      puts 'Authenticating with Yelp...'
+      print 'Authenticating with Yelp... '
       @yelp = yelp
+      print "Authenticated!\n\n"
+      self.yelp
     end
 
     def create_option_parser
@@ -51,9 +57,6 @@ module Coffeefinder
         opts.on('-s', '--sort_by STRING', "How to sort results. Acceptable values: 'distance', 'rating', 'review_count', 'best_match'") do |sort_by|
           options[:sort_by] = sort_by.to_s
         end
-        opts.on('-S', '--STRICT', 'Use a stricter search method. Less results but also less false positives.') do
-          options[:strict] = true
-        end
         opts.on('-v', '--version', 'Display the program version. Overrides all other option behaviors') do
           puts VERSION
           exit
@@ -65,9 +68,19 @@ module Coffeefinder
       end.parse!
     end
 
-    def spaces(iteration_count)
+    def spaces(search_total)
+      string = ' '
+      Math.log10([1, search_total].max).to_i.times do
+        string << ' '
+      end
+      string
+    end
+
+    def inverse_spaces(iteration_count, search_total)
       string = ''
-      (3 - (Math.log10(iteration_count).to_i + 1)).times do
+      (Math.log10([1, search_total].max).to_i -
+        Math.log10(iteration_count + 1).to_i
+      ).times do
         string << ' '
       end
       string
@@ -75,41 +88,48 @@ module Coffeefinder
 
     def get_nearby_query_data
       strict ? yelp.query('nearby_strict') : yelp.query('nearby')
-      yelp.data
+      self.data = yelp.data
+      data
     end
 
-    def search_nearby
-      puts "Press enter to list nearby coffee shops, or type q to quit:\n"
-      input = gets.chomp.strip.downcase
-      count = 1
-      puts "Looking for nearby coffee shops...\n\n"
-      data = get_nearby_query_data
-      puts "Total nearby coffee shops: #{data.search.total}\n\n"
-      while input != 'q' && count <= data.search.total && (data.search.total > yelp.limit || count < data.search.total)
+    def main_menu
+      choice = prompt.select('Choose an action:') do |menu|
+        menu.default 1
+        menu.choice 'Show nearby coffee shops', 1
+        menu.choice 'Show any nearby business that has coffee', 2
+        menu.choice 'Quit', 3
+      end
+      case choice
+      when 1
+        self.strict = true
+      when 2
+        self.strict = false
+      when 3
+        exit(true)
+      end
+      get_nearby_query_data
+      display_search_results
+      nil
+    end
+
+    def display_search_results
+      yelp.update_variables
+      puts "\n#{data.search.total} results found:\n\n" unless yelp.offset.positive?
+      count = 0
+      while count <= data.search.total
         data.search.business.each do |business_object|
-          business = Business.new(business_object, count)
-          puts "#{count}#{spaces(count)}| #{business.name}"
+          business = Business.new(business_object)
+          puts "#{count + 1}#{inverse_spaces(count + 1, data.search.total)}| #{business.name}"
+          puts "#{spaces(data.search.total)}| - About #{business.distance >= 1000 ? "#{business.distance / 1000} km away" : "#{business.distance.to_i} meters away"}"
           count += 1
         end
-        next unless count < data.search.total && data.search.total > yelp.limit
-
-        until (input == instance_of?(Integer) && number <= count && number.positive?) || input == "\n"
-          puts "\nPress enter to list more nearby coffee shops, type a number to view a certain business, or type q to quit:\n"
-          input = gets.chomp.strip.downcase
-          if input.instance_of?(Integer)
-            display_business(input)
-          elsif input == "\n"
-            yelp.offset = count
-            yelp.update_variables
-            data = get_nearby_query_data
-          else
-            puts 'Your input seems to be invalid, please try again.'
-          end
-        end
-        puts 'Enter a number to view the corresponding business, or type q to quit: '
+        break unless count < data.search.total
+        continue = prompt.yes?('Show more results?')
+        break unless continue
+        yelp.offset = count
+        get_nearby_query_data
       end
-
-      # rescue NoMethodError || NameError
+      nil
     end
 
     def display_business(number)
@@ -117,21 +137,23 @@ module Coffeefinder
         business_object.number == number
       end
       puts <<~STRING
-        #{business.number}#{spaces(number)}| Name: #{business.name}
-        #{spaces(number)}  Url: #{business.url}
-        #{spaces(number)}  Rating: #{business.rating}
-        #{spaces(number)}  Reviews: #{business.review_count}
-        #{spaces(number)}  Distance: #{business.distance}
-        #{spaces(number)}  Price range: #{business.price}
-        #{spaces(number)}  Phone: #{business.phone}
-        #{spaces(number)}  Address: #{business.address}
-        #{spaces(number)}  City: #{business.city}
-        #{spaces(number)}  Open now: #{business.open_now ? 'Yes' : 'No'}
+
+        Name: #{business.name}
+        Url: #{business.url}
+        Rating: #{business.rating} stars
+        Reviews: #{business.review_count}
+        Distance: #{business.distance} meters
+        Price: #{business.price}
+        Phone: #{business.phone}
+        Address: #{business.address}
+        City: #{business.city}
+        Open now: #{business.open_now ? 'Yes' : 'No'}
       STRING
+      business
     end
 
     private
 
-    attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict
+    attr_writer :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data
   end
 end

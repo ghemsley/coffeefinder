@@ -17,7 +17,14 @@ module Coffeefinder
       args.each do |key, value|
         send("#{key}=", value)
       end
-      self.variables = { latitude: latitude, longitude: longitude, radius: radius, limit: limit, sort_by: sort_by }
+      self.variables = { 
+        latitude: latitude || 42.0307,
+        longitude: longitude || -87.8107,
+        radius: radius || 500.0,
+        limit: limit || 10,
+        sort_by: sort_by || 'best_match',
+        offset: offset || 0
+      }
     end
 
     def update_variables
