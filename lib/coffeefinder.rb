@@ -1,6 +1,6 @@
-require 'coffeefinder/cli'
-require 'coffeefinder/geoip'
-require 'coffeefinder/yelp'
+require_relative 'coffeefinder/cli'
+require_relative 'coffeefinder/geoip'
+require_relative 'coffeefinder/yelp'
 module Coffeefinder
   class Error < StandardError; end
   cli = CLI.new

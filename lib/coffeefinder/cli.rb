@@ -1,6 +1,6 @@
+require_relative './constants'
+require_relative './business'
 require 'optparse'
-require 'coffeefinder/constants'
-require 'coffeefinder/business'
 require 'tty-prompt'
 require 'pry'
 module Coffeefinder
@@ -114,25 +114,46 @@ module Coffeefinder
         menu.default 1
         menu.choice 'Show nearby coffee shops', 1
         menu.choice 'Show any nearby business that has coffee', 2
-        menu.choice 'Quit', 3
+        menu.choice 'Search for coffee near a certain adress', 3
+        menu.choice 'Quit', 4
       end
       case choice
       when 1
         yelp.strict = true
+        yelp.get_nearby_query_data
+        display_search_results('nearby')
       when 2
         yelp.strict = false
+        yelp.get_nearby_query_data
+        display_search_results('nearby')
       when 3
+        yelp.address = prompt.ask('Enter an address:', default: '11 Broadway, New York, NY')
+        secondary_choice = prompt.select('Choose an action:') do |menu|
+          menu.default 1
+          menu.choice "Show coffee shops near #{yelp.address}", 1
+          menu.choice "Show any business that has coffee near #{yelp.address}", 2
+          menu.choice 'Quit', 3
+        end
+        case secondary_choice
+        when 1
+          yelp.strict = true
+        when 2
+          yelp.strict = false
+        when 3
+          exit(true)
+        end
+        yelp.get_address_query_data
+        display_search_results('address')
+      when 4
         exit(true)
       end
-      yelp.get_nearby_query_data
-      display_search_results
       nil
     end
 
-    def display_search_results
+    def display_search_results(query_type)
       puts "\n#{yelp.data.search.total} results found:\n\n" unless yelp.offset.positive?
       count = 0
-      while count <= yelp.data.search.total
+      while count < yelp.data.search.total
         yelp.data.search.business.each do |business_object|
           business = Business.find_or_create_by_id(business_object)
           puts "#{spaces(yelp.data.search.total)}- - - - - - -"
@@ -147,7 +168,13 @@ module Coffeefinder
         break unless continue
 
         yelp.offset = count
-        yelp.get_nearby_query_data
+        if query_type == 'nearby'
+          yelp.get_nearby_query_data
+        elsif query_type == 'address'
+          yelp.get_address_query_data
+        else
+          puts 'Error: invalid query type detected'
+        end
       end
       puts separator('All results shown.')
       puts "All results shown.\n"

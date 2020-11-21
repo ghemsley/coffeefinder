@@ -1,11 +1,11 @@
-require 'coffeefinder/secrets'
-require 'coffeefinder/constants'
-require 'coffeefinder/query'
+require_relative './secrets'
+require_relative './constants'
+require_relative './query'
 require 'graphlient'
 
 module Coffeefinder
   class Yelp
-    attr_accessor :latitude, :longitude, :radius, :limit, :sort_by, :offset, :strict
+    attr_accessor :latitude, :longitude, :radius, :limit, :sort_by, :offset, :strict, :address
     attr_reader :variables, :data, :client, :searches, :businesses
     def initialize(args = { latitude: 42.0307,
                             longitude: -87.8107,
@@ -13,7 +13,8 @@ module Coffeefinder
                             limit: 10,
                             sort_by: 'best_match',
                             offset: 0,
-                            strict: true })
+                            strict: true,
+                            address: '11 Broadway 2nd floor, New York, NY' })
       self.client = self.class.create_client
       self.searches = []
       self.businesses = []
@@ -27,7 +28,8 @@ module Coffeefinder
         limit: limit || 10,
         sort_by: sort_by || 'best_match',
         offset: offset || 0,
-        strict: strict || true
+        strict: strict || true,
+        address: address || '11 Broadway 2nd floor, New York, NY'
       }
     end
 
@@ -39,6 +41,7 @@ module Coffeefinder
       variables[:sort_by] = sort_by
       variables[:offset] = offset
       variables[:strict] = strict
+      variables[:address] = address
     end
 
     def save_search(search)
@@ -57,6 +60,10 @@ module Coffeefinder
         self.data = client.query(Query.nearby, variables).data
       when 'nearby_strict'
         self.data = client.query(Query.nearby_strict, variables).data
+      when 'address'
+        self.data = client.query(Query.address, variables).data
+      when 'address_strict'
+        self.data = client.query(Query.address_strict, variables).data
       end
       data
     end
@@ -64,6 +71,13 @@ module Coffeefinder
     def get_nearby_query_data
       update_variables
       strict ? query('nearby_strict') : query('nearby')
+      save_search(data.search)
+      data
+    end
+
+    def get_address_query_data
+      update_variables
+      strict ? query('address_strict') : query('address')
       save_search(data.search)
       data
     end

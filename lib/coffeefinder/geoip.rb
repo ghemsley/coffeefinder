@@ -1,4 +1,4 @@
-require 'coffeefinder/constants'
+require_relative './constants'
 require 'net/http'
 require 'json'
 
