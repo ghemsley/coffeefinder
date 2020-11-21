@@ -12,7 +12,8 @@ module Coffeefinder
       self.options = {}
       create_option_parser
       self.limit = options[:limit] || 10
-      self.radius = options[:radius] || 500.0
+      self.radius = options[:radius] || 0.25
+      miles_to_meters
       self.ip_address = options[:ip_address] || ''
       self.sort_by = options[:sort_by] || 'best_match'
       self.strict = true
@@ -34,23 +35,23 @@ module Coffeefinder
           Usage: coffeefinder [options]
 
         BANNER
-        opts.on('-I', '--IP IP_ADDRESS', 'IP address to use for geolocation lookup') do |ip|
-          options[:ip_address] = ip.to_s
-        end
-        opts.on('-r', '--radius FLOAT', 'How big of an area to search, in meters') do |radius|
+        opts.on('-r', '--radius MILES', 'How big of an area to search, in miles. Default: 0.25') do |radius|
           options[:radius] = radius.to_f
         end
-        opts.on('-l', '--limit INTEGER', 'How many results to show at once') do |limit|
-          options[:limit] = limit.to_i
-        end
-        opts.on('-s', '--sort_by STRING', "How to sort results. Acceptable values: 'distance', 'rating', 'review_count', 'best_match'") do |sort_by|
+        opts.on('-s', '--sort_by STRING', "How to sort results. Acceptable values: 'distance', 'rating', 'review_count', 'best_match'. Default: 'best_match'") do |sort_by|
           options[:sort_by] = sort_by.to_s
         end
-        opts.on('-v', '--version', 'Display the program version. Overrides all other option behaviors') do
+        opts.on('-l', '--limit INTEGER', 'How many results to show at once. Default: 10') do |limit|
+          options[:limit] = limit.to_i
+        end
+        opts.on('-I', '--IP IP_ADDRESS', 'IP address to use for geolocation lookup. Default: Your public IP') do |ip|
+          options[:ip_address] = ip.to_s
+        end
+        opts.on('-v', '--version', 'Display the program version') do
           puts VERSION
           exit
         end
-        opts.on('-h', '--help', 'Displays a helpful usage guide. Overrides all other option behaviors') do
+        opts.on('-h', '--help', 'Display a helpful usage guide') do
           puts opts
           exit
         end
@@ -67,7 +68,7 @@ module Coffeefinder
        `----'
 
      coffeefinder
-          
+
     Results by Yelp
       "
     end
@@ -98,7 +99,11 @@ module Coffeefinder
       separator
     end
 
-    def distance_to_km(distance)
+    def miles_to_meters
+      options[:radius] = options[:radius] * 1609.34
+    end
+
+    def meters_to_km(distance)
       if distance >= 1000
         "#{(distance / 1000).truncate(2)} km"
       else
