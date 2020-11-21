@@ -5,7 +5,7 @@ require 'tty-prompt'
 module Coffeefinder
   class CLI
     attr_accessor :geoip, :yelp
-    attr_reader :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data
+    attr_reader :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data, :searches
 
     def initialize
       self.options = {}
@@ -16,6 +16,7 @@ module Coffeefinder
       self.sort_by = options[:sort_by] || 'best_match'
       self.strict = true
       self.prompt = TTY::Prompt.new
+      self.searches = []
     end
 
     def create_option_parser
@@ -95,6 +96,26 @@ module Coffeefinder
       data
     end
 
+    def save_search(results)
+      searches.push(results)
+    end
+
+    def clear_searches
+      searches.clear
+    end
+
+    def searches_to_business_instances
+      businesses = []
+      searches.each do |search|
+        search.business.each do |business|
+          businesses.push(business)
+        end
+      end
+      businesses.collect do |business|
+        Business.find_or_create_by_id(business)
+      end
+    end
+
     def main_menu
       system 'clear' unless Business.all.empty?
       choice = prompt.select('Choose an action:') do |menu|
@@ -128,15 +149,17 @@ module Coffeefinder
           puts "#{spaces(data.search.total)}| * About #{distance_to_km(business.distance)} away"
           count += 1
         end
+        save_search(data.search)
         break unless count < data.search.total
 
         puts "#{spaces(data.search.total)}- - - - - - -"
-        continue = prompt.yes?('Show more results?')
+        continue = prompt.yes?('Keep searching?')
         break unless continue
 
         yelp.offset = count
         get_nearby_query_data
       end
+      puts "All results shown.\n"
       search_complete_menu
       nil
     end
@@ -153,6 +176,7 @@ module Coffeefinder
       when 1
         business_menu
       when 2
+        clear_searches
         main_menu
       when 3
         exit(true)
@@ -162,7 +186,7 @@ module Coffeefinder
 
     def business_menu
       system 'clear'
-      choices = Business.all.collect do |business|
+      choices = data.search.business.collect do |business|
         { name: "View #{business.name} - #{distance_to_km(business.distance)} away", value: business.id }
       end
       choices.push([{ name: 'Return to the main menu to search again', value: 'Return' },
@@ -170,6 +194,7 @@ module Coffeefinder
       choice = prompt.select('Choose a business to display info for. or an action:', choices, per_page: 10)
       case choice
       when 'Return'
+        clear_searches
         main_menu
       when 'Quit'
         exit(true)
@@ -182,8 +207,8 @@ module Coffeefinder
 
     def display_business(id)
       system 'clear'
-      business = Business.all.find do |business_object|
-        business_object.id == id
+      business = searches_to_business_instances.find do |business_instance|
+        business_instance.id == id
       end
       puts separator("Name: #{business.name}")
       puts <<~STRING
@@ -204,6 +229,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data
+    attr_writer :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data, :searches
   end
 end
