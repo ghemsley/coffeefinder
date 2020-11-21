@@ -46,7 +46,8 @@ module Coffeefinder
           options[:ip_address] = ip.to_s
         end
         opts.on('-v', '--version', 'Display the program version') do
-          puts VERSION
+          puts logo
+          puts "     Version #{VERSION}"
           exit
         end
         opts.on('-h', '--help', 'Display a helpful usage guide') do
