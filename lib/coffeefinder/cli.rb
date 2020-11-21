@@ -4,7 +4,8 @@ require 'coffeefinder/business'
 require 'tty-prompt'
 module Coffeefinder
   class CLI
-    attr_reader :yelp, :geoip, :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data
+    attr_accessor :geoip, :yelp
+    attr_reader :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data
 
     def initialize
       self.options = {}
@@ -15,20 +16,6 @@ module Coffeefinder
       self.sort_by = options[:sort_by] || 'best_match'
       self.strict = true
       self.prompt = TTY::Prompt.new
-    end
-
-    def geoip=(geoip)
-      print "Obtaining geolocation data for IP address#{ip_address != '' ? " #{ip_address}" : ''}... "
-      @geoip = geoip
-      print "Obtained!\n"
-      self.geoip
-    end
-
-    def yelp=(yelp)
-      print 'Authenticating with Yelp... '
-      @yelp = yelp
-      print "Authenticated!\n\n"
-      self.yelp
     end
 
     def create_option_parser
@@ -175,12 +162,12 @@ module Coffeefinder
 
     def business_menu
       system 'clear'
-      choices = [
-        { name: 'Return to the main menu to search again', value: 'Return' },
-        { name: 'Quit', value: 'Quit' }
-      ]
-      choices.push(Business.all.collect { |business| { name: "View #{business.name}", value: business.id } })
-      choice = prompt.select('Choose a business to display info for. or an action:', choices)
+      choices = Business.all.collect do |business|
+        { name: "View #{business.name} - #{distance_to_km(business.distance)} away", value: business.id }
+      end
+      choices.push([{ name: 'Return to the main menu to search again', value: 'Return' },
+                    { name: 'Quit', value: 'Quit' }])
+      choice = prompt.select('Choose a business to display info for. or an action:', choices, per_page: 10)
       case choice
       when 'Return'
         main_menu
@@ -195,7 +182,7 @@ module Coffeefinder
 
     def display_business(id)
       system 'clear'
-      business = Business.all[(0..(data.search.total - 1))].find do |business_object|
+      business = Business.all.find do |business_object|
         business_object.id == id
       end
       puts separator("Name: #{business.name}")
