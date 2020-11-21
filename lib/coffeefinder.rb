@@ -14,9 +14,9 @@ module Coffeefinder
                         radius: cli.radius,
                         limit: cli.limit,
                         sort_by: cli.sort_by,
+                        strict: cli.strict,
                         offset: 0
                       })
   print "Authenticated!\n"
-
   cli.main_menu
 end

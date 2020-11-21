@@ -6,7 +6,7 @@ require 'pry'
 module Coffeefinder
   class CLI
     attr_accessor :geoip, :yelp
-    attr_reader :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data, :searches
+    attr_reader :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict
 
     def initialize
       self.options = {}
@@ -17,7 +17,6 @@ module Coffeefinder
       self.sort_by = options[:sort_by] || 'best_match'
       self.strict = true
       self.prompt = TTY::Prompt.new
-      self.searches = []
     end
 
     def create_option_parser
@@ -98,46 +97,18 @@ module Coffeefinder
       separator
     end
 
-    def meters_to_km(distance)
-      if distance >= 1000
-        "#{(distance / 1000).truncate(2)} km"
+    def meters_to_miles(distance)
+      distance *= 0.000621371
+      if distance >= 0.1
+        "#{distance.truncate(2)} miles"
       else
-        "#{distance.to_i} meters"
-      end
-    end
-
-    def get_nearby_query_data
-      strict ? yelp.query('nearby_strict') : yelp.query('nearby')
-      self.data = yelp.data
-      save_search(data.search)
-      data
-    end
-
-    def save_search(search)
-      searches.push(search)
-      searches
-    end
-
-    def clear_searches
-      searches.clear
-      searches
-    end
-
-    def searches_to_business_instances
-      businesses = []
-      searches.each do |search|
-        search.business.each do |business|
-          businesses.push(business)
-        end
-      end
-      businesses.collect do |business|
-        Business.find_or_create_by_id(business)
+        "#{distance * 5280} feet"
       end
     end
 
     def main_menu
       system 'clear' unless Business.all.empty?
-      clear_searches
+      yelp.clear_searches
       puts logo + "\n"
       choice = prompt.select('Choose an action:') do |menu|
         menu.default 1
@@ -147,39 +118,40 @@ module Coffeefinder
       end
       case choice
       when 1
-        self.strict = true
+        yelp.strict = true
       when 2
-        self.strict = false
+        yelp.strict = false
       when 3
         exit(true)
       end
-      get_nearby_query_data
+      yelp.get_nearby_query_data
       display_search_results
       nil
     end
 
     def display_search_results
-      yelp.update_variables
-      puts "\n#{data.search.total} results found:\n\n" unless yelp.offset.positive?
+      puts "\n#{yelp.data.search.total} results found:\n\n" unless yelp.offset.positive?
       count = 0
-      while count <= data.search.total
-        data.search.business.each do |business_object|
+      while count <= yelp.data.search.total
+        yelp.data.search.business.each do |business_object|
           business = Business.find_or_create_by_id(business_object)
-          puts "#{spaces(data.search.total)}- - - - - - -"
-          puts "#{count + 1}#{inverse_spaces(count, data.search.total)}| #{business.name}"
-          puts "#{spaces(data.search.total)}| * About #{distance_to_km(business.distance)} away"
+          puts "#{spaces(yelp.data.search.total)}- - - - - - -"
+          puts "#{count + 1}#{inverse_spaces(count, yelp.data.search.total)}| #{business.name}"
+          puts "#{spaces(yelp.data.search.total)}| * About #{meters_to_miles(business.distance)} away"
           count += 1
         end
-        break unless count < data.search.total
+        break unless count < yelp.data.search.total
 
-        puts "#{spaces(data.search.total)}- - - - - - -"
+        puts separator('Keep searching?')
         continue = prompt.yes?('Keep searching?')
         break unless continue
 
         yelp.offset = count
-        get_nearby_query_data
+        yelp.get_nearby_query_data
       end
+      puts separator('All results shown.')
       puts "All results shown.\n"
+      puts separator('All results shown.')
       search_complete_menu
       nil
     end
@@ -205,12 +177,13 @@ module Coffeefinder
 
     def business_menu
       system 'clear'
-      choices = searches_to_business_instances.collect do |business|
-        { name: "View #{business.name} - #{distance_to_km(business.distance)} away", value: business.id }
+      yelp.searches_to_business_instances
+      choices = yelp.businesses.collect do |business|
+        { name: "View #{business.name} - #{meters_to_miles(business.distance)} away", value: business.id }
       end
       choices.push([{ name: 'Return to the main menu to search again', value: 'Return' },
                     { name: 'Quit', value: 'Quit' }])
-      choice = prompt.select('Choose an action or a business to display info for:', choices, per_page: 10)
+      choice = prompt.select('Choose an action or a business to display info for:', choices, per_page: 12)
       case choice
       when 'Return'
         main_menu
@@ -225,7 +198,7 @@ module Coffeefinder
 
     def display_business(id)
       system 'clear'
-      business = searches_to_business_instances.find do |business_instance|
+      business = yelp.businesses.find do |business_instance|
         business_instance.id == id
       end
       puts separator("Name: #{business.name}")
@@ -234,7 +207,7 @@ module Coffeefinder
         Url: #{business.url}
         Rating: #{business.rating} stars
         Reviews: #{business.review_count}
-        Distance: #{distance_to_km(business.distance)}
+        Distance: #{meters_to_miles(business.distance)}
         Price: #{business.price}
         Phone: #{business.phone}
         Address: #{business.address}
@@ -247,6 +220,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict, :data, :searches
+    attr_writer :options, :prompt, :limit, :radius, :ip_address, :sort_by, :strict
   end
 end
