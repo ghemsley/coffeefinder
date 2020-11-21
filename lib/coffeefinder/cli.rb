@@ -135,15 +135,48 @@ module Coffeefinder
         yelp.offset = count
         get_nearby_query_data
       end
+      business_menu
       nil
     end
 
-    def display_business(number)
+    def search_complete_menu
+      choice = prompt.select('Choose an action:') do |menu|
+        menu.default 1
+        menu.choice 'Display a business', 1
+        menu.choice 'Return to the main menu to search again', 2
+        menu.choice 'Quit', 3
+      end
+      case choice
+      when 1
+        business_menu
+      when 2
+        main_menu
+      when 3
+        exit(true)
+      end
+      nil
+    end
+
+    def business_menu
+      choices = ['Return to the main menu to search again', 'Quit']
+      choice.push(Business.all.collect(&:name))
+      choice = prompt.enum_select('Choose an business to display. or an action:', choices)
+      case choice
+      when 'Return to the main menu to search again'
+        main_menu
+      when 'Quit'
+        exit(true)
+      else
+        display_business(choice)
+      end
+      nil
+    end
+
+    def display_business(name)
       business = Business.all.find do |business_object|
-        business_object.number == number
+        business_object.name == name
       end
       puts <<~STRING
-
         Name: #{business.name}
         Url: #{business.url}
         Rating: #{business.rating} stars
