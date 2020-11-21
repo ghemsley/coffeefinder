@@ -86,6 +86,22 @@ module Coffeefinder
       string
     end
 
+    def separator(string)
+      separator = '-'
+      (string.length / 2).times do
+        separator << ' -'
+      end
+      separator
+    end
+
+    def distance_to_km(distance)
+      if distance >= 1000
+        "#{(distance / 1000).truncate(2)} km"
+      else
+        "#{distance.to_i} meters"
+      end
+    end
+
     def get_nearby_query_data
       strict ? yelp.query('nearby_strict') : yelp.query('nearby')
       self.data = yelp.data
@@ -93,6 +109,7 @@ module Coffeefinder
     end
 
     def main_menu
+      system 'clear' unless Business.all.empty?
       choice = prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Show nearby coffee shops', 1
@@ -120,11 +137,8 @@ module Coffeefinder
         data.search.business.each do |business_object|
           business = Business.new(business_object)
           puts "#{count + 1}#{inverse_spaces(count + 1, data.search.total)}| #{business.name}"
-          puts "#{spaces(data.search.total)}| - About #{if business.distance >= 1000
-                                                          "#{(business.distance / 1000).truncate(2)} km away"
-                                                        else
-                                                          "#{business.distance.to_i} meters away"
-                                                        end}"
+          puts "#{spaces(data.search.total)}| - About #{distance_to_km(business.distance)} away"
+          puts separator("#{spaces(data.search.total)}| - About #{distance_to_km(business.distance)} away")
           count += 1
         end
         break unless count < data.search.total
@@ -135,11 +149,12 @@ module Coffeefinder
         yelp.offset = count
         get_nearby_query_data
       end
-      business_menu
+      search_complete_menu
       nil
     end
 
     def search_complete_menu
+      system 'clear' if
       choice = prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Display a business', 1
@@ -158,36 +173,44 @@ module Coffeefinder
     end
 
     def business_menu
-      choices = ['Return to the main menu to search again', 'Quit']
-      choice.push(Business.all.collect(&:name))
-      choice = prompt.enum_select('Choose an business to display. or an action:', choices)
+      system 'clear'
+      choices = [
+        { name: 'Return to the main menu to search again', value: 'Return' },
+        { name: 'Quit', value: 'Quit' }
+      ]
+      choices.push(Business.all.collect { |business| { name: "View #{business.name}", value: business.id } })
+      choice = prompt.select('Choose a business to display info for. or an action:', choices)
       case choice
-      when 'Return to the main menu to search again'
+      when 'Return'
         main_menu
       when 'Quit'
         exit(true)
       else
         display_business(choice)
       end
+      search_complete_menu
       nil
     end
 
-    def display_business(name)
+    def display_business(id)
+      system 'clear'
       business = Business.all.find do |business_object|
-        business_object.name == name
+        business_object.id == id
       end
+      puts separator("Name: #{business.name}")
       puts <<~STRING
         Name: #{business.name}
         Url: #{business.url}
         Rating: #{business.rating} stars
         Reviews: #{business.review_count}
-        Distance: #{business.distance} meters
+        Distance: #{distance_to_km(business.distance)}
         Price: #{business.price}
         Phone: #{business.phone}
         Address: #{business.address}
         City: #{business.city}
         Open now: #{business.open_now ? 'Yes' : 'No'}
       STRING
+      puts separator(business.name)
       business
     end
 
