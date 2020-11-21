@@ -59,12 +59,12 @@ module Coffeefinder
 
     def logo
       "
-        ( (
-        ) )
-      ........
-      |      | ]
-      \\      /
-       `----'
+         ( (
+         ) )
+       ........
+       |      | ]
+       \\      /
+        `----'
 
      coffeefinder
 
@@ -92,7 +92,7 @@ module Coffeefinder
 
     def separator(string)
       separator = ''
-      (string.length).times do
+      string.length.times do
         separator << '─'
       end
       separator
@@ -103,12 +103,11 @@ module Coffeefinder
       if distance >= 0.1
         "#{distance.truncate(2)} miles"
       else
-        "#{distance * 5280} feet"
+        "#{(distance * 5280).to_i} feet"
       end
     end
 
     def main_menu
-      system 'clear' unless Business.all.empty?
       yelp.clear_searches
       puts logo + "\n"
       choice = prompt.select('Choose an action:') do |menu|
@@ -168,7 +167,7 @@ module Coffeefinder
         end
         puts table.render(
           :unicode,
-          alignments: %i[center left center],
+          alignments: %i[center left center]
         )
         break unless count < yelp.data.search.total
 
@@ -188,7 +187,20 @@ module Coffeefinder
       puts separator('All results shown.')
       puts "All results shown.\n"
       puts separator('All results shown.')
-      search_complete_menu
+      if yelp.data.search.total.positive?
+        search_complete_menu
+      else
+        choice = prompt.select('Choose an action:') do |menu|
+          menu.default 1
+          menu.choice 'Return to the main menu', 1
+          menu.choice 'Quit', 2
+        end
+        if choice == 1
+          main_menu
+        else
+          exit(true)
+        end
+      end
       nil
     end
 
@@ -211,11 +223,31 @@ module Coffeefinder
       nil
     end
 
+    def longest_name
+      yelp.businesses.max_by do |business|
+        business.name.length
+      end.name
+    end
+
+    def longest_distance
+      yelp.businesses.max_by do |business|
+        meters_to_miles(business.distance).length
+      end.name
+    end
+
+    def space_evenly(longer_string, shorter_string)
+      spaces = ''
+      (longer_string.length - shorter_string.length).times do
+        spaces << ' '
+      end
+      spaces
+    end
+
     def business_menu
-      system 'clear'
       yelp.searches_to_business_instances
       choices = yelp.businesses.collect do |business|
-        { name: "View #{business.name} - #{meters_to_miles(business.distance)} away", value: business.id }
+        { name: "#{business.name}#{space_evenly(longest_name, business.name)} - #{meters_to_miles(business.distance)} away#{space_evenly(longest_distance, meters_to_miles(business.distance))}",
+          value: business.id }
       end
       choices.push([{ name: 'Return to the main menu to search again', value: 'Return' },
                     { name: 'Quit', value: 'Quit' }])
@@ -233,24 +265,41 @@ module Coffeefinder
     end
 
     def display_business(id)
-      system 'clear'
       business = yelp.businesses.find do |business_instance|
         business_instance.id == id
       end
-      puts separator("Name: #{business.name}")
-      puts <<~STRING
-        Name: #{business.name}
-        Url: #{business.url}
-        Rating: #{business.rating} stars
-        Reviews: #{business.review_count}
-        Distance: #{meters_to_miles(business.distance)}
-        Price: #{business.price}
-        Phone: #{business.phone}
-        Address: #{business.address}
-        City: #{business.city}
-        Open now: #{business.open_now ? 'Yes' : 'No'}
-      STRING
-      puts separator("Name: #{business.name}")
+      table = TTY::Table.new(
+        header: %w[Attribute Value]
+      )
+      table << { 'Atribute' => 'Name', 'Value' => business.name }
+      table << { 'Atribute' => 'Rating', 'Value' => business.rating }
+      table << { 'Atribute' => 'Reviews', 'Value' => business.review_count }
+      table << { 'Atribute' => 'Distance', 'Value' => meters_to_miles(business.distance) }
+      table << { 'Atribute' => 'Price', 'Value' => business.price }
+      table << { 'Atribute' => 'Address', 'Value' => business.address }
+      table << { 'Atribute' => 'City', 'Value' => business.city }
+      table << { 'Atribute' => 'Open now', 'Value' => business.open_now ? 'Yes' : 'No' }
+      puts table.render(
+        :unicode,
+        alignments: %i[center left]
+      )
+      puts separator("Attribute | #{business.name} |")
+      puts "Url: #{business.url}"
+      puts separator("Attribute | #{business.name} |")
+      # puts separator("Name: #{business.name}")
+      # puts <<~STRING
+      #   Name: #{business.name}
+      #   Url: #{business.url}
+      #   Rating: #{business.rating} stars
+      #   Reviews: #{business.review_count}
+      #   Distance: #{meters_to_miles(business.distance)}
+      #   Price: #{business.price}
+      #   Phone: #{business.phone}
+      #   Address: #{business.address}
+      #   City: #{business.city}
+      #   Open now: #{business.open_now ? 'Yes' : 'No'}
+      # STRING
+      # puts separator("Name: #{business.name}")
       business
     end
 
