@@ -2,6 +2,7 @@ require 'optparse'
 require 'coffeefinder/constants'
 require 'coffeefinder/business'
 require 'tty-prompt'
+require 'pry'
 module Coffeefinder
   class CLI
     attr_accessor :geoip, :yelp
@@ -93,15 +94,18 @@ module Coffeefinder
     def get_nearby_query_data
       strict ? yelp.query('nearby_strict') : yelp.query('nearby')
       self.data = yelp.data
+      save_search(data.search)
       data
     end
 
-    def save_search(results)
-      searches.push(results)
+    def save_search(search)
+      searches.push(search)
+      searches
     end
 
     def clear_searches
       searches.clear
+      searches
     end
 
     def searches_to_business_instances
@@ -118,6 +122,7 @@ module Coffeefinder
 
     def main_menu
       system 'clear' unless Business.all.empty?
+      clear_searches
       choice = prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Show nearby coffee shops', 1
@@ -149,7 +154,6 @@ module Coffeefinder
           puts "#{spaces(data.search.total)}| * About #{distance_to_km(business.distance)} away"
           count += 1
         end
-        save_search(data.search)
         break unless count < data.search.total
 
         puts "#{spaces(data.search.total)}- - - - - - -"
@@ -176,7 +180,6 @@ module Coffeefinder
       when 1
         business_menu
       when 2
-        clear_searches
         main_menu
       when 3
         exit(true)
@@ -186,15 +189,14 @@ module Coffeefinder
 
     def business_menu
       system 'clear'
-      choices = data.search.business.collect do |business|
+      choices = searches_to_business_instances.collect do |business|
         { name: "View #{business.name} - #{distance_to_km(business.distance)} away", value: business.id }
       end
       choices.push([{ name: 'Return to the main menu to search again', value: 'Return' },
                     { name: 'Quit', value: 'Quit' }])
-      choice = prompt.select('Choose a business to display info for. or an action:', choices, per_page: 10)
+      choice = prompt.select('Choose an action or a business to display info for:', choices, per_page: 10)
       case choice
       when 'Return'
-        clear_searches
         main_menu
       when 'Quit'
         exit(true)
