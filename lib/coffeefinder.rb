@@ -16,7 +16,7 @@ module Coffeefinder
                         sort_by: cli.sort_by,
                         offset: 0
                       })
-  print "Authenticated!\n\n"
+  print "Authenticated!\n"
 
   cli.main_menu
 end

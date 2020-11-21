@@ -57,6 +57,21 @@ module Coffeefinder
       end.parse!
     end
 
+    def logo
+      "
+        ( (
+        ) )
+      ........
+      |      | ]
+      \\      /
+       `----'
+
+     coffeefinder
+          
+    Results by Yelp
+      "
+    end
+
     def spaces(search_total)
       string = ' '
       Math.log10([1, search_total].max).to_i.times do
@@ -123,6 +138,7 @@ module Coffeefinder
     def main_menu
       system 'clear' unless Business.all.empty?
       clear_searches
+      puts logo + "\n"
       choice = prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Show nearby coffee shops', 1
