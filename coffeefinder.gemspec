@@ -24,5 +24,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.add_runtime_dependency 'graphlient', '~> 0.4.0'
   spec.add_runtime_dependency 'tty-prompt', '~> 0.22.0'
+  spec.add_runtime_dependency 'tty-table', '~> 0.12.0'
   spec.add_development_dependency 'pry'
 end

@@ -2,7 +2,7 @@ require_relative './constants'
 require_relative './business'
 require 'optparse'
 require 'tty-prompt'
-require 'pry'
+require 'tty-table'
 module Coffeefinder
   class CLI
     attr_accessor :geoip, :yelp
@@ -12,7 +12,7 @@ module Coffeefinder
       self.options = {}
       create_option_parser
       self.limit = options[:limit] || 10
-      self.radius = options[:radius] || 804.672
+      self.radius = options[:radius] || 805.0
       self.ip_address = options[:ip_address] || ''
       self.sort_by = options[:sort_by] || 'best_match'
       self.strict = true
@@ -91,9 +91,9 @@ module Coffeefinder
     end
 
     def separator(string)
-      separator = '-'
-      (string.length / 2).times do
-        separator << ' -'
+      separator = ''
+      (string.length).times do
+        separator << '─'
       end
       separator
     end
@@ -155,13 +155,21 @@ module Coffeefinder
       puts "\n#{yelp.data.search.total} results found:\n\n" unless yelp.offset.positive?
       count = 0
       while count < yelp.data.search.total
+        table = TTY::Table.new(
+          header: %w[Number Name Distance]
+        )
         yelp.data.search.business.each do |business_object|
           business = Business.find_or_create_by_id(business_object)
-          puts "#{spaces(yelp.data.search.total)}- - - - - - -"
-          puts "#{count + 1}#{inverse_spaces(count, yelp.data.search.total)}| #{business.name}"
-          puts "#{spaces(yelp.data.search.total)}| * About #{meters_to_miles(business.distance)} away"
+          table << ({ 'Number' => (count + 1), 'Name' => business.name, 'Distance' => meters_to_miles(business.distance) })
+          # puts "#{spaces(yelp.data.search.total)}- - - - - - -"
+          # puts "#{count + 1}#{inverse_spaces(count, yelp.data.search.total)}| #{business.name}"
+          # puts "#{spaces(yelp.data.search.total)}| * About #{meters_to_miles(business.distance)} away"
           count += 1
         end
+        puts table.render(
+          :unicode,
+          alignments: %i[center left center],
+        )
         break unless count < yelp.data.search.total
 
         puts separator('Keep searching?')
