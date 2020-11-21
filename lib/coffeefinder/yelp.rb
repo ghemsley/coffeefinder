@@ -9,7 +9,7 @@ module Coffeefinder
     attr_reader :variables, :data, :client
     def initialize(args = { latitude: 42.0307,
                             longitude: -87.8107,
-                            radius: 500.0,
+                            radius: 805.0,
                             limit: 10,
                             sort_by: 'best_match',
                             offset: 0 })
@@ -17,10 +17,10 @@ module Coffeefinder
       args.each do |key, value|
         send("#{key}=", value)
       end
-      self.variables = { 
+      self.variables = {
         latitude: latitude || 42.0307,
         longitude: longitude || -87.8107,
-        radius: radius || 500.0,
+        radius: radius || 805.0,
         limit: limit || 10,
         sort_by: sort_by || 'best_match',
         offset: offset || 0
@@ -62,6 +62,5 @@ module Coffeefinder
     private
 
     attr_writer :variables, :data, :client
-
   end
 end

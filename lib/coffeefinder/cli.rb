@@ -12,8 +12,7 @@ module Coffeefinder
       self.options = {}
       create_option_parser
       self.limit = options[:limit] || 10
-      self.radius = options[:radius] || 0.25
-      miles_to_meters
+      self.radius = options[:radius] || 804.672
       self.ip_address = options[:ip_address] || ''
       self.sort_by = options[:sort_by] || 'best_match'
       self.strict = true
@@ -35,8 +34,8 @@ module Coffeefinder
           Usage: coffeefinder [options]
 
         BANNER
-        opts.on('-r', '--radius MILES', 'How big of an area to search, in miles. Default: 0.25') do |radius|
-          options[:radius] = radius.to_f
+        opts.on('-r', '--radius MILES', 'How big of an area to search, in miles. Default: 0.5 miles, max 10 miles') do |radius|
+          options[:radius] = [radius.to_f * 1609.34, 16_093.4].min
         end
         opts.on('-s', '--sort_by STRING', "How to sort results. Acceptable values: 'distance', 'rating', 'review_count', 'best_match'. Default: 'best_match'") do |sort_by|
           options[:sort_by] = sort_by.to_s
@@ -97,10 +96,6 @@ module Coffeefinder
         separator << ' -'
       end
       separator
-    end
-
-    def miles_to_meters
-      options[:radius] = options[:radius] * 1609.34
     end
 
     def meters_to_km(distance)
