@@ -17,6 +17,12 @@ class Business
     self.class.all.push(self)
   end
 
+  def self.find_or_create_by_id(business)
+    all.find do |existing_business|
+      existing_business.id == business.id
+    end || new(business)
+  end
+
   def self.all
     @@all
   end

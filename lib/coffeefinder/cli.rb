@@ -135,14 +135,15 @@ module Coffeefinder
       count = 0
       while count <= data.search.total
         data.search.business.each do |business_object|
-          business = Business.new(business_object)
-          puts "#{count + 1}#{inverse_spaces(count + 1, data.search.total)}| #{business.name}"
-          puts "#{spaces(data.search.total)}| - About #{distance_to_km(business.distance)} away"
-          puts separator("#{spaces(data.search.total)}| - About #{distance_to_km(business.distance)} away")
+          business = Business.find_or_create_by_id(business_object)
+          puts "#{spaces(data.search.total)}- - - - - - -"
+          puts "#{count + 1}#{inverse_spaces(count, data.search.total)}| #{business.name}"
+          puts "#{spaces(data.search.total)}| * About #{distance_to_km(business.distance)} away"
           count += 1
         end
         break unless count < data.search.total
 
+        puts "#{spaces(data.search.total)}- - - - - - -"
         continue = prompt.yes?('Show more results?')
         break unless continue
 
@@ -154,7 +155,7 @@ module Coffeefinder
     end
 
     def search_complete_menu
-      system 'clear' if
+      yelp.offset = 0
       choice = prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Display a business', 1
@@ -194,7 +195,7 @@ module Coffeefinder
 
     def display_business(id)
       system 'clear'
-      business = Business.all.find do |business_object|
+      business = Business.all[(0..(data.search.total - 1))].find do |business_object|
         business_object.id == id
       end
       puts separator("Name: #{business.name}")
@@ -210,7 +211,7 @@ module Coffeefinder
         City: #{business.city}
         Open now: #{business.open_now ? 'Yes' : 'No'}
       STRING
-      puts separator(business.name)
+      puts separator("Name: #{business.name}")
       business
     end
 
