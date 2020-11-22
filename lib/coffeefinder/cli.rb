@@ -71,33 +71,6 @@ module Coffeefinder
       nil
     end
 
-    def search_complete_menu
-      yelp.offset = 0
-      choice = prompt.select('Choose an action:') do |menu|
-        menu.default 1
-        menu.choice 'Display a business', 1
-        menu.choice 'Return to the main menu to search again', 2
-        menu.choice 'Quit', 3
-      end
-      case choice
-      when 1
-        business_menu
-      when 2
-        main_menu
-      when 3
-        exit(true)
-      end
-      nil
-    end
-
-    def search_results_prompt
-      prompt.select('Choose an action:') do |menu|
-        menu.default 1
-        menu.choice 'Return to the main menu', 1
-        menu.choice 'Quit', 2
-      end
-    end
-
     def display_table
       table = TTY::Table.new(
         header: ['Number', 'Name', sort_by_string(options[:sort_by])]
@@ -133,6 +106,33 @@ module Coffeefinder
         :unicode,
         alignments: %i[center left center]
       )
+    end
+
+    def search_complete_menu
+      yelp.offset = 0
+      choice = prompt.select('Choose an action:') do |menu|
+        menu.default 1
+        menu.choice 'Display a business', 1
+        menu.choice 'Return to the main menu to search again', 2
+        menu.choice 'Quit', 3
+      end
+      case choice
+      when 1
+        business_menu
+      when 2
+        main_menu
+      when 3
+        exit(true)
+      end
+      nil
+    end
+
+    def search_results_empty_prompt
+      prompt.select('Choose an action:') do |menu|
+        menu.default 1
+        menu.choice 'Return to the main menu', 1
+        menu.choice 'Quit', 2
+      end
     end
 
     def display_search_results(query_type)
