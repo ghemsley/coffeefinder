@@ -17,7 +17,6 @@ module Coffeefinder
       self.radius = options[:radius] || DEFAULT_RADIUS
       self.sort_by = options[:sort_by] || DEFAULT_SORT
       self.ip_address = options[:ip_address]
-      self.count = 0
       self.prompt = TTY::Prompt.new
     end
 
@@ -72,12 +71,40 @@ module Coffeefinder
       nil
     end
 
+    def search_complete_menu
+      yelp.offset = 0
+      choice = prompt.select('Choose an action:') do |menu|
+        menu.default 1
+        menu.choice 'Display a business', 1
+        menu.choice 'Return to the main menu to search again', 2
+        menu.choice 'Quit', 3
+      end
+      case choice
+      when 1
+        business_menu
+      when 2
+        main_menu
+      when 3
+        exit(true)
+      end
+      nil
+    end
+
+    def search_results_prompt
+      prompt.select('Choose an action:') do |menu|
+        menu.default 1
+        menu.choice 'Return to the main menu', 1
+        menu.choice 'Quit', 2
+      end
+    end
+
     def display_table
       table = TTY::Table.new(
         header: ['Number', 'Name', sort_by_string(options[:sort_by])]
       )
       yelp.data.search.business.each do |business_object|
         business = Business.find_or_create_by_id(business_object)
+        business.number = count
         table << case options[:sort_by]
                  when 'best_match'
                    { 'Number' => (count + 1),
@@ -108,33 +135,6 @@ module Coffeefinder
       )
     end
 
-    def search_complete_menu
-      yelp.offset = 0
-      choice = prompt.select('Choose an action:') do |menu|
-        menu.default 1
-        menu.choice 'Display a business', 1
-        menu.choice 'Return to the main menu to search again', 2
-        menu.choice 'Quit', 3
-      end
-      case choice
-      when 1
-        business_menu
-      when 2
-        main_menu
-      when 3
-        exit(true)
-      end
-      nil
-    end
-
-    def search_results_prompt
-      prompt.select('Choose an action:') do |menu|
-        menu.default 1
-        menu.choice 'Return to the main menu', 1
-        menu.choice 'Quit', 2
-      end
-    end
-
     def display_search_results(query_type)
       puts "\n#{yelp.data.search.total} results found:\n\n" unless yelp.offset.positive?
       self.count = 0
@@ -159,7 +159,7 @@ module Coffeefinder
       if yelp.data.search.total.positive?
         search_complete_menu
       else
-        choice = search_results_prompt
+        choice = search_results_empty_prompt
         if choice == 1
           main_menu
         else
@@ -173,19 +173,19 @@ module Coffeefinder
       choices = yelp.businesses.collect do |business|
         case options[:sort_by]
         when 'best_match'
-          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} stars",
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         when 'distance'
-          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{meters_to_miles(business.distance)} away",
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{meters_to_miles(business.distance)} away",
             value: business.id }
         when 'rating'
-          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} stars",
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         when 'review_count'
-          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} reviews",
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
             value: business.id }
         else
-          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} stars",
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         end
       end
@@ -207,12 +207,6 @@ module Coffeefinder
       end
       search_complete_menu
       nil
-    end
-
-    def find_business(id)
-      yelp.businesses.find do |business_instance|
-        business_instance.id == id
-      end
     end
 
     def business_table(business)
@@ -241,7 +235,7 @@ module Coffeefinder
     end
 
     def display_business(id)
-      business = find_business(id)
+      business = yelp.find_business(id)
       puts business_table(business)
       display_business_url(business)
       business

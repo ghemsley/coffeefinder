@@ -8,10 +8,10 @@ module Coffeefinder
       string
     end
 
-    def inverse_spaces(iteration_count, search_total)
+    def inverse_spaces(number, search_total)
       string = ''
       (Math.log10([1, search_total].max).to_i -
-        Math.log10(iteration_count + 1).to_i
+        Math.log10([1, number].max).to_i
       ).times do
         string << ' '
       end

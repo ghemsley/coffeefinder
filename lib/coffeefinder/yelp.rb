@@ -107,6 +107,12 @@ module Coffeefinder
       businesses
     end
 
+    def find_business(id)
+      businesses.find do |business_instance|
+        business_instance.id == id
+      end
+    end
+
     def self.create_client
       client = Graphlient::Client.new(YELP_API,
                                       headers: {
