@@ -82,7 +82,7 @@ module Coffeefinder
                  when 'best_match'
                    { 'Number' => (count + 1),
                      'Name' => business.name,
-                     'Rating' => business.rating }
+                     'Rating' => "#{business.rating} stars" }
                  when 'distance'
                    { 'Number' => (count + 1),
                      'Name' => business.name,
@@ -90,15 +90,15 @@ module Coffeefinder
                  when 'rating'
                    { 'Number' => (count + 1),
                      'Name' => business.name,
-                     'Rating' => business.rating }
+                     'Rating' => "#{business.rating} stars" }
                  when 'review_count'
                    { 'Number' => (count + 1),
                      'Name' => business.name,
-                     'Reviews' => business.review_count }
+                     'Reviews' => "#{business.review_count} reviews" }
                  else
                    { 'Number' => (count + 1),
                      'Name' => business.name,
-                     'Rating' => business.rating }
+                     'Rating' => "#{business.rating} stars" }
                  end
         self.count += 1
       end
