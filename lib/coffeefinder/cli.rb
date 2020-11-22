@@ -7,8 +7,8 @@ require 'tty-table'
 module Coffeefinder
   class CLI
     include Coffeefinder::Formatting
-    attr_accessor :geoip, :yelp, :prompt, :parser, :count
-    attr_reader :options, :limit, :radius, :ip_address, :sort_by
+    attr_accessor :geoip, :yelp, :prompt, :parser
+    attr_reader :options, :limit, :radius, :ip_address, :sort_by, :count
 
     def initialize
       self.parser = Parser.new
@@ -234,6 +234,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict
+    attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict, :count
   end
 end

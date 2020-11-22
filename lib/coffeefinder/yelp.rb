@@ -1,10 +1,12 @@
 require_relative './concerns/constants'
 require_relative './concerns/queries'
+require_relative './concerns/formatting'
 require_relative './secrets'
 require 'graphlient'
 
 module Coffeefinder
   class Yelp
+    include Coffeefinder::Formatting
     include Coffeefinder::Queries
     attr_accessor :latitude, :longitude, :radius, :limit, :sort_by, :offset, :strict, :address
     attr_reader :variables, :data, :client, :searches, :businesses
@@ -57,15 +59,25 @@ module Coffeefinder
 
     def query(query_type)
       update_variables
-      case query_type
-      when 'nearby'
-        self.data = client.query(nearby_query, variables).data
-      when 'nearby_strict'
-        self.data = client.query(nearby_strict_query, variables).data
-      when 'address'
-        self.data = client.query(address_query, variables).data
-      when 'address_strict'
-        self.data = client.query(address_strict_query, variables).data
+      begin
+        case query_type
+        when 'nearby'
+          self.data = client.query(nearby_query, variables).data
+        when 'nearby_strict'
+          self.data = client.query(nearby_strict_query, variables).data
+        when 'address'
+          self.data = client.query(address_query, variables).data
+        when 'address_strict'
+          self.data = client.query(address_strict_query, variables).data
+        end
+      rescue Graphlient::Errors::ExecutionError
+        puts separator('Please check the options you submitted to the program and run it again, or try again later.')
+        puts "Something went wrong when trying to run the query '#{query_type}'."
+        puts "It's likely that an invalid IP address was specified at program launch."
+        puts 'You could also be getting ratelimited.'
+        puts 'Please check the options you submitted to the program and run it again, or try again later.'
+        puts separator('Please check the options you submitted to the program and run it again, or try again later.')
+        exit(false)
       end
       data
     end
