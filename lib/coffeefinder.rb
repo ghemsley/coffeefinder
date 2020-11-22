@@ -1,6 +1,3 @@
-require_relative 'coffeefinder/cli'
-require_relative 'coffeefinder/geoip'
-require_relative 'coffeefinder/yelp'
 module Coffeefinder
   cli = CLI.new
   print "Obtaining geolocation data for IP address#{cli.ip_address != '' ? " #{cli.ip_address}" : ''}... "

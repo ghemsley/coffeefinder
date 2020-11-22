@@ -1,7 +1,3 @@
-require_relative './concerns/constants'
-require_relative './concerns/queries'
-require_relative './concerns/formatting'
-require_relative './secrets'
 require 'graphlient'
 
 module Coffeefinder

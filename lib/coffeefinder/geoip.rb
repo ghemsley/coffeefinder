@@ -1,4 +1,3 @@
-require_relative './concerns/constants.rb'
 require 'net/http'
 require 'json'
 

@@ -1,7 +1,3 @@
-require_relative './concerns/formatting'
-require_relative './concerns/constants'
-require_relative './parser'
-require_relative './business'
 require 'tty-prompt'
 require 'tty-table'
 module Coffeefinder

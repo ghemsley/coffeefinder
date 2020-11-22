@@ -1,5 +1,3 @@
-require_relative './concerns/constants'
-require_relative './concerns/formatting'
 require 'optparse'
 
 module Coffeefinder
