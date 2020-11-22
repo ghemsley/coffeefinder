@@ -171,8 +171,23 @@ module Coffeefinder
 
     def build_business_menu_choices
       choices = yelp.businesses.collect do |business|
-        { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{meters_to_miles(business.distance)} away#{space_evenly(longest_distance(yelp), meters_to_miles(business.distance))}",
-          value: business.id }
+        case options[:sort_by]
+        when 'best_match'
+          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} stars",
+            value: business.id }
+        when 'distance'
+          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{meters_to_miles(business.distance)} away",
+            value: business.id }
+        when 'rating'
+          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} stars",
+            value: business.id }
+        when 'review_count'
+          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} reviews",
+            value: business.id }
+        else
+          { name: "#{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} stars",
+            value: business.id }
+        end
       end
       choices.push([{ name: 'Return to the main menu to search again', value: 'Return' },
                     { name: 'Quit', value: 'Quit' }])

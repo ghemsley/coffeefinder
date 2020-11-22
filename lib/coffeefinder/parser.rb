@@ -14,7 +14,7 @@ module Coffeefinder
       OptionParser.new do |opts|
         opts.banner = BANNER
         opts.on('-r', '--radius MILES', 'How big of an area to search, in miles. Default: 0.5 miles, max 10 miles') do |radius|
-          raise ParserError unless (0..10).include?(radius)
+          raise ParserError unless (0..10).include?(radius.to_f)
 
           options[:radius] = [radius.to_f * 1609.34, 16_093.4].min || DEFAULT_RADIUS
         end
