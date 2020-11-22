@@ -100,7 +100,7 @@ module Coffeefinder
       end
       puts table.render(
         :unicode,
-        alignments: %i[center left center]
+        alignments: %i[center left left]
       )
     end
 

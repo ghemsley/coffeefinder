@@ -1,6 +1,6 @@
 # Coffeefinder
 
-
+A Ruby CLI app for finding local coffee shops and other places that sell coffee
 
 ## Installation
 

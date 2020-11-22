@@ -6,9 +6,9 @@ class Business
   def initialize(business)
     self.id = business.id || SecureRandom.uuid
     self.name = business.name || 'Unknown'
-    self.rating = business.rating || 0
+    self.rating = business.rating || 'Unknown'
     self.review_count = business.review_count || 0
-    self.distance = business.distance || 0.0
+    self.distance = business.distance || 'Unknown'
     self.price = business.price || 'Unknown'
     self.url = business.url || 'Unknown'
     self.phone = business.phone || 'Unknown'
