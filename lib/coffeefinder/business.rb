@@ -2,7 +2,7 @@ require 'securerandom'
 module Coffeefinder
   class Business
     @@all = []
-    attr_reader :number, :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city, :photo
+    attr_reader :number, :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city
 
     def initialize(business)
       self.id = business.id || SecureRandom.uuid
@@ -33,6 +33,6 @@ module Coffeefinder
       @@all
     end
 
-    attr_writer :number, :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city, :photo
+    attr_writer :number, :id, :name, :rating, :review_count, :distance, :price, :url, :phone, :open_now, :address, :city
   end
 end
