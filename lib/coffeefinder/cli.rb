@@ -136,7 +136,7 @@ module Coffeefinder
     end
 
     def display_search_results(query_type)
-      puts "\n#{yelp.data.search.total} results found:\n\n" unless yelp.offset.positive?
+      puts "\n#{yelp.data.search.total} results found\n\n" unless yelp.offset.positive?
       self.count = 0
       while count < yelp.data.search.total
         display_table

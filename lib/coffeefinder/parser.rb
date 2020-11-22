@@ -13,7 +13,7 @@ module Coffeefinder
     def create_option_parser
       OptionParser.new do |opts|
         opts.banner = BANNER
-        opts.on('-r', '--radius MILES', 'How big of an area to search, in miles. Default: 0.5 miles, max 10 miles') do |radius|
+        opts.on('-r', '--radius MILES', 'How big of an area to search, in miles. Default: 0.5, max 10') do |radius|
           raise ParserError unless (0..10).include?(radius.to_f)
 
           options[:radius] = [radius.to_f * 1609.34, 16_093.4].min || DEFAULT_RADIUS
@@ -52,7 +52,7 @@ module Coffeefinder
     end
 
     class ParserError < StandardError
-      extend Coffeefinder::Formatting
+      extend Formatting
       def self.message
         puts separator('Please check the provided options for validity and try again.')
         puts 'One or more of the arguments provided seem to be invalid.'
