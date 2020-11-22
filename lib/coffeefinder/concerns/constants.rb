@@ -24,6 +24,7 @@ module Coffeefinder
 
     Results by Yelp
       ".freeze
+  API_KEY = ENV["YELP_API_KEY"]
   YELP_API = 'https://api.yelp.com/v3/graphql'.freeze
   GEOIP_API = 'http://ip-api.com/json/'.freeze
   DEFAULT_LIMIT = 10
