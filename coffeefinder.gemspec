@@ -1,4 +1,4 @@
-require_relative 'lib/coffeefinder/constants'
+require_relative 'lib/coffeefinder/concerns/constants'
 
 Gem::Specification.new do |spec|
   spec.name          = 'coffeefinder'

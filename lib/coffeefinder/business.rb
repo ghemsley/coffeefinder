@@ -11,7 +11,7 @@ class Business
     self.price = business.price if business.price
     self.url = business.url if business.url
     self.phone = business.phone if business.phone
-    self.open_now = business.hours if business.hours
+    self.open_now = business.hours.first.is_open_now if business.hours
     self.address = business.location.address1 if business.location.address1
     self.city = business.location.city if business.location.city
     self.class.all.push(self)

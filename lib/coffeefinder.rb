@@ -2,7 +2,6 @@ require_relative 'coffeefinder/cli'
 require_relative 'coffeefinder/geoip'
 require_relative 'coffeefinder/yelp'
 module Coffeefinder
-  class Error < StandardError; end
   cli = CLI.new
   print "Obtaining geolocation data for IP address#{cli.ip_address != '' ? " #{cli.ip_address}" : ''}... "
   cli.geoip = GeoIP.new(cli.ip_address)
@@ -13,9 +12,7 @@ module Coffeefinder
                         longitude: cli.geoip.longitude,
                         radius: cli.radius,
                         limit: cli.limit,
-                        sort_by: cli.sort_by,
-                        strict: cli.strict,
-                        offset: 0
+                        sort_by: cli.sort_by
                       })
   print "Authenticated!\n"
   cli.main_menu
