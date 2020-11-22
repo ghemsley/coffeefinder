@@ -1,35 +1,33 @@
 # Coffeefinder
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/coffeefinder`. To experiment with that code, run `bin/console` for an interactive prompt.
 
-TODO: Delete this and the text above, and describe your gem
 
 ## Installation
 
-Add this line to your application's Gemfile:
+First, you will need to get an API key from Yelp. 
 
-```ruby
-gem 'coffeefinder'
-```
+Create an account at https://www.yelp.com, then go https://www.yelp.com/developers/faq and follow the steps outlined under the heading 'How can I get started using the Yelp Fusion API?'. 
 
-And then execute:
+Once those are done, go to 'Manage app' and join the developer beta to gain access to the Yelp GraphQL API. Once that's done, copy the long string at the top of the page under the heading 'API Key'. 
 
-    $ bundle install
+Save that key somewhere safe using a text editor, then in your terminal type `export YELP_API_KEY=your_api_key_goes_here`.
 
-Or install it yourself as:
+Next, using your terminal in the coffeefinder project directory root, run the command `./bin/setup`, followed by `bundle exec rake install`.
 
-    $ gem install coffeefinder
+Now you should be ready to run Coffeefinder!
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+Usage: coffeefinder [options]
 
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
+    -r, --radius MILES               How big of an area to search, in miles. Default: 0.5, max 10
+    -s, --sort_by STRING             How to sort results. Acceptable values: 'distance', 'rating', 'review_count', 'best_match'. Default: 'best_match'
+    -l, --limit INTEGER              How many results to show at once. Default: 10, max: 50
+    -i, --ip IP_ADDRESS              IP address to use for geolocation lookup. Default: Your public IP
+    -v, --version                    Display the program version
+    -h, --help                       Display a helpful usage guide
+```
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/ghemsley/coffeefinder.
