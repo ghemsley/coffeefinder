@@ -6,7 +6,7 @@ require 'tty-prompt'
 require 'tty-table'
 module Coffeefinder
   class CLI
-    include Coffeefinder::Formatting
+    include Formatting
     attr_accessor :geoip, :yelp, :prompt, :parser
     attr_reader :options, :limit, :radius, :ip_address, :sort_by, :count
 
@@ -77,7 +77,7 @@ module Coffeefinder
       )
       yelp.data.search.business.each do |business_object|
         business = Business.find_or_create_by_id(business_object)
-        business.number = count
+        business.number = count + 1
         table << case options[:sort_by]
                  when 'best_match'
                    { 'Number' => (count + 1),
@@ -228,9 +228,9 @@ module Coffeefinder
     end
 
     def display_business_url(business)
-      puts separator("Attribute | #{business.name} |")
+      puts separator("Url: #{business.url}")
       puts "Url: #{business.url}"
-      puts separator("Attribute | #{business.name} |")
+      puts separator("Url: #{business.url}")
       nil
     end
 

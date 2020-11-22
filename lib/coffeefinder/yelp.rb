@@ -6,8 +6,8 @@ require 'graphlient'
 
 module Coffeefinder
   class Yelp
-    include Coffeefinder::Formatting
-    include Coffeefinder::Queries
+    include Formatting
+    include Queries
     attr_accessor :latitude, :longitude, :radius, :limit, :sort_by, :offset, :strict, :address
     attr_reader :variables, :data, :client, :searches, :businesses
     def initialize(args = { latitude: nil,
