@@ -2,11 +2,11 @@ require 'tty-table'
 
 module Coffeefinder
   class Table
+    include Formatting
     attr_reader :options
     def initialize(options)
       self.options = options
     end
-    include Formatting
 
     def search_result_table(yelp, iteration_count)
       table = TTY::Table.new(

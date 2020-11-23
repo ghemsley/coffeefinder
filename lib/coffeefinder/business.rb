@@ -14,7 +14,7 @@ module Coffeefinder
       self.url = business.url || 'Unknown'
       self.phone = business.phone || 'Unknown'
       begin
-        self.open_now = business.hours.first.is_open_now || false
+        self.open_now = business.hours.first.is_open_now
       rescue NoMethodError
         self.open_now = false
       end
