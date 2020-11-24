@@ -6,8 +6,8 @@ module Coffeefinder
     include Queries
     attr_accessor :latitude, :longitude, :radius, :limit, :sort_by, :offset, :strict, :address
     attr_reader :variables, :data, :client, :searches, :businesses
-    def initialize(args = { latitude: nil,
-                            longitude: nil,
+    def initialize(args = { latitude: 40.705409778017824,
+                            longitude: -74.01392545907245,
                             radius: DEFAULT_RADIUS,
                             limit: DEFAULT_LIMIT,
                             sort_by: DEFAULT_SORT })

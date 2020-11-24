@@ -1,7 +1,5 @@
-# ignore personal access token
-lib/coffeefinder/secrets.rb
-
 # Ignore vscode and gemfile.lock
+.vscode
 .vscode/
 Gemfile.lock
 
