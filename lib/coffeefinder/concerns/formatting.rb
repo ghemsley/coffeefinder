@@ -75,5 +75,12 @@ module Coffeefinder
         'Rating'
       end
     end
+
+    def display_business_url(business)
+      puts separator("Url: #{business.url}")
+      puts "Url: #{business.url}"
+      puts separator("Url: #{business.url}")
+      nil
+    end
   end
 end

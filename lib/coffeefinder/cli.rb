@@ -95,13 +95,6 @@ module Coffeefinder
       nil
     end
 
-    def display_business_url(business)
-      puts separator("Url: #{business.url}")
-      puts "Url: #{business.url}"
-      puts separator("Url: #{business.url}")
-      nil
-    end
-
     def display_business(id)
       business = yelp.find_business(id)
       table.business_table(business)
