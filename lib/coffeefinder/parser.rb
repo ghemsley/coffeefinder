@@ -1,5 +1,3 @@
-require 'optparse'
-
 module Coffeefinder
   class Parser
     attr_reader :options

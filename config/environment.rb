@@ -1,3 +1,12 @@
+
+require 'optparse'
+require 'tty-prompt'
+require 'tty-table'
+require 'graphlient'
+require 'net/http'
+require 'json'
+require 'securerandom'
+
 require_relative '../lib/coffeefinder/concerns/formatting'
 require_relative '../lib/coffeefinder/concerns/constants'
 require_relative '../lib/coffeefinder/concerns/queries'

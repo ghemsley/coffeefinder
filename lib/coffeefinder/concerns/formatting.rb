@@ -82,5 +82,15 @@ module Coffeefinder
       puts separator("Url: #{business.url}")
       nil
     end
+
+    def fix_businesses_distance_sorting(businesses, sort_by)
+      if sort_by == 'distance'
+        businesses.sort_by!(&:distance)
+        businesses.each.with_index(1) do |business, index|
+          business.number = index
+        end
+      end
+      businesses
+    end
   end
 end

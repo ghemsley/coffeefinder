@@ -1,5 +1,3 @@
-require 'tty-table'
-
 module Coffeefinder
   class Table
     include Formatting
@@ -12,8 +10,10 @@ module Coffeefinder
       table = TTY::Table.new(
         header: ['Number', 'Name', sort_by_string(options[:sort_by])]
       )
-      yelp.data.search.business.each do |business_object|
-        business = Business.find_or_create_by_id(business_object)
+      yelp_results = yelp.data.search.business.collect { |yelp_business| yelp_business }
+      yelp_results.sort_by!(&:distance) if options[:sort_by] == 'distance'
+      yelp_results.each do |yelp_business|
+        business = Business.find_or_create_by_id(yelp_business)
         business.number = iteration_count + 1
         table << case options[:sort_by]
                  when 'best_match'

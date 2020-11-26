@@ -1,5 +1,3 @@
-require 'graphlient'
-
 module Coffeefinder
   class Yelp
     include Formatting

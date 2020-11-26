@@ -1,6 +1,3 @@
-require 'net/http'
-require 'json'
-
 module Coffeefinder
   class GeoIP
     attr_accessor :ip_address

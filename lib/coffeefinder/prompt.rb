@@ -1,5 +1,3 @@
-require 'tty-prompt'
-
 module Coffeefinder
   class Prompt
     include Formatting
@@ -54,7 +52,8 @@ module Coffeefinder
     end
 
     def business_menu_prompt(yelp)
-      choices = yelp.businesses.collect do |business|
+      businesses = fix_businesses_distance_sorting(yelp.businesses, options[:sort_by])
+      choices = businesses.collect do |business|
         case options[:sort_by]
         when 'best_match'
           { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
