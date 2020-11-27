@@ -81,7 +81,7 @@ module Coffeefinder
           puts 'Error: invalid query type detected'
         end
       end
-      print_all_results_shown if count + 1 == yelp.data.search.total
+      print_all_results_shown if count == yelp.data.search.total
       if yelp.data.search.total.positive?
         search_complete_menu
       else

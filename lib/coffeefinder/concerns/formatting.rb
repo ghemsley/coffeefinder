@@ -20,7 +20,7 @@ module Coffeefinder
 
     def separator(string)
       separator = ''
-      string.length.times do
+      [string.length, `tput cols`.to_i].min.times do
         separator << '─'
       end
       separator
