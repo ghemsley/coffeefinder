@@ -18,7 +18,7 @@ module Coffeefinder
     end
 
     def address_prompt
-      prompt.ask('Enter an address:', default: '11 Broadway, New York, NY')
+      prompt.ask('Enter an address:', default: DEFAULT_ADDRESS)
     end
 
     def main_menu_secondary_prompt(yelp)

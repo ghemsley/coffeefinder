@@ -1,4 +1,3 @@
-
 require 'optparse'
 require 'tty-prompt'
 require 'tty-table'

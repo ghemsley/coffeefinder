@@ -64,7 +64,7 @@ module Coffeefinder
         when 'address_strict'
           self.data = client.query(address_strict_query, variables).data
         end
-      rescue Graphlient::Errors::ExecutionError || Graphlient::Errors::FaradayServerError
+      rescue Graphlient::Errors::ExecutionError, Graphlient::Errors::FaradayServerError
         puts separator('Please check the options you submitted to the program and run it again, or try again later.')
         puts "Something went wrong when trying to run the query '#{query_type}'."
         puts "It's possible that an invalid IP address was specified at program launch."
