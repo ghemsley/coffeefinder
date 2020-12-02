@@ -2,7 +2,7 @@ module Coffeefinder
   class CLI
     include Formatting
     attr_accessor :geoip, :yelp, :prompt, :parser
-    attr_reader :options, :limit, :radius, :ip_address, :sort_by, :count, :table
+    attr_reader :options, :limit, :radius, :ip_address, :sort_by, :count, :table, :favorites
 
     def initialize
       self.parser = Parser.new
@@ -11,12 +11,14 @@ module Coffeefinder
       self.radius = options[:radius] || DEFAULT_RADIUS
       self.sort_by = options[:sort_by] || DEFAULT_SORT
       self.ip_address = options[:ip_address]
-      self.prompt = Prompt.new(options)
+      self.favorites = Favorites.new(FILE_PATH)
+      self.prompt = Prompt.new(options, favorites.list)
       self.table = Table.new(options)
     end
 
     def main_menu
       yelp.clear_searches
+      yelp.clear_businesses
       puts LOGO + "\n"
       choice = prompt.main_menu_prompt
       case choice
@@ -42,7 +44,21 @@ module Coffeefinder
         yelp.get_address_query_data
         display_search_results('address')
       when 4
+        if favorites.list.empty?
+          exit(true)
+        else
+          favorites_menu
+        end
+      when 5
+        if favorites.list.empty?
+          exit(true)
+        else
+          clear_favorites
+        end
+      when 6
         exit(true)
+      else
+        puts 'Error: something went wrong displaying the main menu'
       end
       nil
     end
@@ -54,8 +70,10 @@ module Coffeefinder
       when 1
         business_menu
       when 2
-        main_menu
+        save_business_menu
       when 3
+        main_menu
+      when 4
         exit(true)
       end
       nil
@@ -65,7 +83,7 @@ module Coffeefinder
       puts "\n#{yelp.data.search.total} results found\n\n" unless yelp.offset.positive?
       self.count = 0
       while count < yelp.data.search.total
-        self.count = table.search_result_table(yelp, self.count)
+        self.count = table.search_result_table(yelp, count)
         break unless count < yelp.data.search.total
 
         puts separator('Keep searching?')
@@ -96,7 +114,8 @@ module Coffeefinder
     end
 
     def display_business(id)
-      business = yelp.find_business(id)
+      business_result = yelp.find_business(id)
+      business = Business.find_or_create_by_id(business_result)
       table.business_table(business)
       display_business_url(business)
       business
@@ -117,8 +136,65 @@ module Coffeefinder
       nil
     end
 
+    def save_business(id)
+      business = yelp.find_business(id)
+      favorites.save_to_list(business)
+      favorites.list
+    end
+
+    def save_business_menu
+      yelp.searches_to_business_instances
+      choice = prompt.save_business_menu_prompt(yelp)
+      case choice
+      when 'Return'
+        main_menu
+      when 'Quit'
+        exit(true)
+      else
+        display_business(choice)
+      end
+      save_business(choice) if prompt.save_business_prompt
+      search_complete_menu
+      nil
+    end
+
+    def build_favorites_businesses
+      favorites.list.collect do |favorite|
+        yelp.id = favorite
+        yelp.update_variables
+        yelp.get_business_query_data
+      end
+      businesses = yelp.businesses.collect do |business_result|
+        Business.find_or_create_by_id(business_result)
+      end
+      businesses
+    end
+
+    def favorites_menu
+      choice = nil
+      businesses = build_favorites_businesses
+      while choice != 'Return' && choice != 'Quit'
+        choice = prompt.favorites_menu_prompt(yelp, businesses)
+        case choice
+        when 'Return'
+          main_menu
+        when 'Quit'
+          exit(true)
+        else
+          display_business(choice)
+        end
+      end
+      nil
+    end
+
+    def clear_favorites
+      favorites.clear if prompt.clear_favorites_prompt
+      main_menu
+    end
+
+
     private
 
-    attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict, :count, :table
+    attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict, :count, :table, :favorites
   end
 end

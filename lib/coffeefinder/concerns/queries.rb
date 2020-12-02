@@ -107,5 +107,30 @@ module Coffeefinder
         }
       GRAPHQL
     end
+
+    def business_query
+      <<~GRAPHQL
+        query ($id: String) {
+          business(id: $id) {
+            id
+            name
+            rating
+            review_count
+            distance
+            price
+            review_count
+            url
+            phone
+            hours {
+              is_open_now
+            }
+            location {
+              address1
+              city
+            }
+          }
+        }
+      GRAPHQL
+    end
   end
 end

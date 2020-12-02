@@ -83,6 +83,51 @@ module Coffeefinder
       nil
     end
 
+    def build_sorted_business_choice(options:, yelp:, business:)
+      case options[:sort_by]
+      when 'best_match'
+        begin
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
+            value: business.id }
+        rescue GraphQL::Client::UnfetchedFieldError
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
+            value: business.id }
+        end
+      when 'distance'
+        begin
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{meters_to_miles(business.distance)} away",
+            value: business.id }
+        rescue GraphQL::Client::UnfetchedFieldError
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{meters_to_miles(business.distance)} away",
+            value: business.id }
+        end
+      when 'rating'
+        begin
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
+            value: business.id }
+        rescue GraphQL::Client::UnfetchedFieldError
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
+            value: business.id }
+        end
+      when 'review_count'
+        begin
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
+            value: business.id }
+        rescue GraphQL::Client::UnfetchedFieldError
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.businesses.lengthj)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
+            value: business.id }
+        end
+      else
+        begin
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
+            value: business.id }
+        rescue GraphQL::Client::UnfetchedFieldError
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating} star#{business.rating != 1 ? 's' : ''}",
+            value: business.id }
+        end
+      end
+    end
+
     def fix_businesses_distance_sorting(businesses, sort_by)
       if sort_by == 'distance'
         businesses.sort_by!(&:distance)
@@ -91,6 +136,22 @@ module Coffeefinder
         end
       end
       businesses
+    end
+
+    def sort_favorites(options, favorites)
+      case options[:sort_by]
+      when 'best_match'
+        favorites.sort_by!(&:rating)
+      when 'distance'
+        favorites.sort_by!(&:distance)
+      when 'rating'
+        favorites.sort_by!(&:rating)
+      when 'review_count'
+        favorites.sort_by!(&:review_count)
+      else
+        favorites.sort_by!(&:rating)
+      end
+      favorites
     end
   end
 end
