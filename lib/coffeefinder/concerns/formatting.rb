@@ -114,7 +114,7 @@ module Coffeefinder
           { name: "#{business.number}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
             value: business.id }
         rescue GraphQL::Client::UnfetchedFieldError
-          { name: "#{business.number}#{inverse_spaces(business.number, yelp.businesses.lengthj)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
+          { name: "#{business.number}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
             value: business.id }
         end
       else
@@ -128,28 +128,50 @@ module Coffeefinder
       end
     end
 
-    def fix_businesses_distance_sorting(businesses, sort_by)
+    def fix_businesses_sorting(businesses, sort_by)
+      # if sort_by == 'best_match'
+      #   businesses.sort_by!(&:rating).reverse!
+      #   businesses.each.with_index(1) do |business, index|
+      #     business.number = index
+      #   end
+      # elsif sort_by == 'distance'
       if sort_by == 'distance'
         businesses.sort_by!(&:distance)
         businesses.each.with_index(1) do |business, index|
           business.number = index
         end
+      # elsif sort_by == 'rating'
+      #   businesses.sort_by!(&:rating).reverse!
+      #   businesses.each.with_index(1) do |business, index|
+      #     business.number = index
+      #   end
+      elsif sort_by == 'review_count'
+        businesses.sort_by!(&:review_count).reverse!
+        businesses.each.with_index(1) do |business, index|
+          business.number = index
+        end
       end
+      # else
+      #   businesses.sort_by!(&:rating).reverse!
+      #   businesses.each.with_index(1) do |business, index|
+      #     business.number = index
+      #   end
+      # end
       businesses
     end
 
     def sort_favorites(options, favorites)
       case options[:sort_by]
       when 'best_match'
-        favorites.sort_by!(&:rating)
+        favorites.sort_by!(&:rating).reverse!
       when 'distance'
-        favorites.sort_by!(&:distance)
+        favorites.sort_by!(&:distance).reverse!
       when 'rating'
-        favorites.sort_by!(&:rating)
+        favorites.sort_by!(&:rating).reverse!
       when 'review_count'
-        favorites.sort_by!(&:review_count)
+        favorites.sort_by!(&:review_count).reverse!
       else
-        favorites.sort_by!(&:rating)
+        favorites.sort_by!(&:rating).reverse!
       end
       favorites
     end

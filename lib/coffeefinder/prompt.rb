@@ -60,7 +60,7 @@ module Coffeefinder
     end
 
     def business_menu_prompt(yelp)
-      businesses = fix_businesses_distance_sorting(yelp.businesses, options[:sort_by])
+      businesses = fix_businesses_sorting(yelp.businesses, options[:sort_by])
       choices = businesses.collect do |business|
         build_sorted_business_choice(options: options, yelp: yelp, business: business)
       end
@@ -70,7 +70,7 @@ module Coffeefinder
     end
 
     def save_business_menu_prompt(yelp)
-      businesses = fix_businesses_distance_sorting(yelp.businesses, options[:sort_by])
+      businesses = fix_businesses_sorting(yelp.businesses, options[:sort_by])
       choices = businesses.collect do |business|
         build_sorted_business_choice(options: options, yelp: yelp, business: business)
       end
