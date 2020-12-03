@@ -89,13 +89,29 @@ module Coffeefinder
         business.number = index
         build_sorted_business_choice(options: options, yelp: yelp, business: business)
       end
-      choices.push([{ name: 'Return to the main menu', value: 'Return' },
+      choices.push([{ name: 'Remove a business from favorites', value: 'Remove' },
+                    { name: 'Return to the main menu', value: 'Return' },
                     { name: 'Quit', value: 'Quit' }])
       prompt.select('Choose an action or a business to display info for:', choices, per_page: options[:limit] + 2)
     end
 
     def clear_favorites_prompt
       prompt.yes?('Clear all favorites?')
+    end
+
+    def remove_favorite_prompt(yelp, favorites)
+      sort_favorites(options, favorites)
+      choices = favorites.collect.with_index(1) do |business, index|
+        business.number = index
+        build_sorted_business_choice(options: options, yelp: yelp, business: business)
+      end
+      choices.push([{ name: 'Return to the previous menu', value: 'Return' },
+                    { name: 'Quit', value: 'Quit' }])
+      prompt.select('Choose an action or a business to remove from favorites:', choices, per_page: options[:limit] + 2)
+    end
+
+    def confirm_remove_favorite_prompt
+      prompt.yes?('Remove from favorites?')
     end
 
     private

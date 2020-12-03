@@ -6,15 +6,22 @@ module Coffeefinder
       self.file = FileIO.new(path)
       self.list_hash = file.read_json.transform_keys(&:to_sym) || {}
       file.hash = list_hash || {}
-      if !list_hash.empty? 
-        self.list = list_hash[:favorites_array] 
-      else
-        self.list = []
-      end
+      self.list = if !list_hash.empty?
+                    list_hash[:favorites_array]
+                  else
+                    []
+                  end
     end
 
     def save_to_list(business)
       list.push(business.id) unless list.include?(business.id)
+      list_hash[:favorites_array] = list
+      file.hash = list_hash
+      file.write_json
+    end
+
+    def delete_from_list(id)
+      list.delete(id) unless !list.include?(id)
       list_hash[:favorites_array] = list
       file.hash = list_hash
       file.write_json

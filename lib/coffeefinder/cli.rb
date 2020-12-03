@@ -170,12 +170,14 @@ module Coffeefinder
       businesses
     end
 
-    def favorites_menu
+    def favorites_menu(businesses = nil)
       choice = nil
-      businesses = build_favorites_businesses
+      businesses ||= build_favorites_businesses
       while choice != 'Return' && choice != 'Quit'
         choice = prompt.favorites_menu_prompt(yelp, businesses)
         case choice
+        when 'Remove'
+          remove_favorite_menu(businesses)
         when 'Return'
           main_menu
         when 'Quit'
@@ -192,6 +194,27 @@ module Coffeefinder
       main_menu
     end
 
+    def remove_favorite(id, businesses)
+      favorites.delete_from_list(id)
+      businesses.delete_if do |business|
+        business.id == id
+      end
+      main_menu if businesses.empty?
+    end
+
+    def remove_favorite_menu(businesses = nil)
+      businesses ||= build_favorites_businesses
+      choice = prompt.remove_favorite_prompt(yelp, businesses)
+      case choice
+      when 'Return'
+        favorites_menu(businesses)
+      when 'Quit'
+        exit(true)
+      else
+        remove_favorite(choice, businesses) if prompt.confirm_remove_favorite_prompt
+      end
+      nil
+    end
 
     private
 
