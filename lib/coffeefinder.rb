@@ -12,5 +12,6 @@ module Coffeefinder
                         sort_by: cli.sort_by
                       })
   print "Authenticated!\n"
+  puts String.colors
   cli.main_menu
 end

@@ -20,7 +20,7 @@ module Coffeefinder
       yelp.clear_searches
       yelp.clear_businesses
       puts LOGO + "\n"
-      choice = prompt.main_menu_prompt
+      choice = prompt.main_menu
       case choice
       when 1
         yelp.strict = true
@@ -31,8 +31,8 @@ module Coffeefinder
         yelp.get_nearby_query_data
         display_search_results('nearby')
       when 3
-        yelp.address = prompt.address_prompt
-        secondary_choice = prompt.main_menu_secondary_prompt(yelp)
+        yelp.address = prompt.address
+        secondary_choice = prompt.main_menu_secondary(yelp)
         case secondary_choice
         when 1
           yelp.strict = true
@@ -65,7 +65,7 @@ module Coffeefinder
 
     def search_complete_menu
       yelp.offset = 0
-      choice = prompt.search_complete_prompt
+      choice = prompt.search_complete
       case choice
       when 1
         business_menu
@@ -87,7 +87,7 @@ module Coffeefinder
         break unless count < yelp.data.search.total
 
         puts separator('Keep searching?')
-        continue = prompt.keep_searching_prompt
+        continue = prompt.keep_searching
         break unless continue
 
         yelp.offset = count
@@ -103,7 +103,7 @@ module Coffeefinder
       if yelp.data.search.total.positive?
         search_complete_menu
       else
-        choice = prompt.search_results_empty_prompt
+        choice = prompt.search_results_empty
         if choice == 1
           main_menu
         else
@@ -123,7 +123,7 @@ module Coffeefinder
 
     def business_menu
       yelp.searches_to_business_instances
-      choice = prompt.business_menu_prompt(yelp)
+      choice = prompt.business_menu(yelp)
       case choice
       when 'Return'
         main_menu
@@ -144,7 +144,7 @@ module Coffeefinder
 
     def save_business_menu
       yelp.searches_to_business_instances
-      choice = prompt.save_business_menu_prompt(yelp)
+      choice = prompt.save_business_menu(yelp)
       case choice
       when 'Return'
         main_menu
@@ -153,12 +153,12 @@ module Coffeefinder
       else
         display_business(choice)
       end
-      save_business(choice) if prompt.save_business_prompt
+      save_business(choice) if prompt.save_business
       search_complete_menu
       nil
     end
 
-    def build_favorites_businesses
+    def build_favorite_businesses
       favorites.list.collect do |favorite|
         yelp.id = favorite
         yelp.update_variables
@@ -172,9 +172,9 @@ module Coffeefinder
 
     def favorites_menu(businesses = nil)
       choice = nil
-      businesses ||= build_favorites_businesses
+      businesses ||= build_favorite_businesses
       while choice != 'Return' && choice != 'Quit'
-        choice = prompt.favorites_menu_prompt(yelp, businesses)
+        choice = prompt.favorites_menu(yelp, businesses)
         case choice
         when 'Remove'
           remove_favorite_menu(businesses)
@@ -190,8 +190,9 @@ module Coffeefinder
     end
 
     def clear_favorites
-      favorites.clear if prompt.clear_favorites_prompt
+      favorites.clear if prompt.clear_favorites
       main_menu
+      nil
     end
 
     def remove_favorite(id, businesses)
@@ -200,18 +201,19 @@ module Coffeefinder
         business.id == id
       end
       main_menu if businesses.empty?
+      nil
     end
 
     def remove_favorite_menu(businesses = nil)
-      businesses ||= build_favorites_businesses
-      choice = prompt.remove_favorite_prompt(yelp, businesses)
+      businesses ||= build_favorite_businesses
+      choice = prompt.remove_favorite(yelp, businesses)
       case choice
       when 'Return'
         favorites_menu(businesses)
       when 'Quit'
         exit(true)
       else
-        remove_favorite(choice, businesses) if prompt.confirm_remove_favorite_prompt
+        remove_favorite(choice, businesses) if prompt.confirm_remove_favorite
       end
       nil
     end

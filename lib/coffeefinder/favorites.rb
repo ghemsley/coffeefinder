@@ -21,7 +21,10 @@ module Coffeefinder
     end
 
     def delete_from_list(id)
-      list.delete(id) unless !list.include?(id)
+      Business.all.delete_if do |business|
+        business.id == id
+      end
+      list.delete(id) if list.include?(id)
       list_hash[:favorites_array] = list
       file.hash = list_hash
       file.write_json

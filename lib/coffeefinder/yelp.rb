@@ -60,6 +60,7 @@ module Coffeefinder
 
     def clear_businesses
       businesses.clear
+      Business.all.clear
       businesses
     end
 

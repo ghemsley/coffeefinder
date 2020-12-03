@@ -8,7 +8,7 @@ module Coffeefinder
       self.favorites = favorites
     end
 
-    def main_menu_prompt
+    def main_menu
       prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Show nearby coffee shops', 1
@@ -24,11 +24,11 @@ module Coffeefinder
       end
     end
 
-    def address_prompt
+    def address
       prompt.ask('Enter an address:', default: DEFAULT_ADDRESS)
     end
 
-    def main_menu_secondary_prompt(yelp)
+    def main_menu_secondary(yelp)
       prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice "Show coffee shops near #{yelp.address}", 1
@@ -37,11 +37,11 @@ module Coffeefinder
       end
     end
 
-    def keep_searching_prompt
+    def keep_searching
       prompt.yes?('Keep searching?')
     end
 
-    def search_complete_prompt
+    def search_complete
       prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Display a business', 1
@@ -51,7 +51,7 @@ module Coffeefinder
       end
     end
 
-    def search_results_empty_prompt
+    def search_results_empty
       prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Return to the main menu', 1
@@ -59,7 +59,7 @@ module Coffeefinder
       end
     end
 
-    def business_menu_prompt(yelp)
+    def business_menu(yelp)
       businesses = fix_businesses_sorting(yelp.businesses, options[:sort_by])
       choices = businesses.collect do |business|
         build_sorted_business_choice(options: options, yelp: yelp, business: business)
@@ -69,7 +69,7 @@ module Coffeefinder
       prompt.select('Choose an action or a business to display info for:', choices, per_page: options[:limit] + 2)
     end
 
-    def save_business_menu_prompt(yelp)
+    def save_business_menu(yelp)
       businesses = fix_businesses_sorting(yelp.businesses, options[:sort_by])
       choices = businesses.collect do |business|
         build_sorted_business_choice(options: options, yelp: yelp, business: business)
@@ -79,11 +79,11 @@ module Coffeefinder
       prompt.select('Choose an action or a business to save to favorites:', choices, per_page: options[:limit] + 2)
     end
 
-    def save_business_prompt
+    def save_business
       prompt.yes?('Save business to favorites?')
     end
 
-    def favorites_menu_prompt(yelp, favorites)
+    def favorites_menu(yelp, favorites)
       sort_favorites(options, favorites)
       choices = favorites.collect.with_index(1) do |business, index|
         business.number = index
@@ -95,11 +95,11 @@ module Coffeefinder
       prompt.select('Choose an action or a business to display info for:', choices, per_page: options[:limit] + 2)
     end
 
-    def clear_favorites_prompt
+    def clear_favorites
       prompt.yes?('Clear all favorites?')
     end
 
-    def remove_favorite_prompt(yelp, favorites)
+    def remove_favorite(yelp, favorites)
       sort_favorites(options, favorites)
       choices = favorites.collect.with_index(1) do |business, index|
         business.number = index
@@ -110,7 +110,7 @@ module Coffeefinder
       prompt.select('Choose an action or a business to remove from favorites:', choices, per_page: options[:limit] + 2)
     end
 
-    def confirm_remove_favorite_prompt
+    def confirm_remove_favorite
       prompt.yes?('Remove from favorites?')
     end
 

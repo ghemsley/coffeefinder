@@ -5,6 +5,7 @@ require 'graphlient'
 require 'net/http'
 require 'json'
 require 'securerandom'
+require 'colorize'
 
 require_relative '../lib/coffeefinder/concerns/formatting'
 require_relative '../lib/coffeefinder/concerns/constants'
