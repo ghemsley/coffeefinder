@@ -23,7 +23,7 @@ module Coffeefinder
       [string.length, `tput cols`.to_i].min.times do
         separator << '─'
       end
-      separator.colorize(:light_blue)
+      separator.colorize(:light_cyan)
     end
 
     def meters_to_miles(distance)
@@ -87,42 +87,42 @@ module Coffeefinder
       case options[:sort_by]
       when 'best_match'
         begin
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         rescue GraphQL::Client::UnfetchedFieldError
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         end
       when 'distance'
         begin
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{meters_to_miles(business.distance)} away",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{meters_to_miles(business.distance)} away",
             value: business.id }
         rescue GraphQL::Client::UnfetchedFieldError
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} #{business.distance.zero? ? '' : "- #{meters_to_miles(business.distance)} away"}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} #{business.distance.zero? ? '' : "- #{meters_to_miles(business.distance)} away"}",
             value: business.id }
         end
       when 'rating'
         begin
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         rescue GraphQL::Client::UnfetchedFieldError
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         end
       when 'review_count'
         begin
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
             value: business.id }
         rescue GraphQL::Client::UnfetchedFieldError
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.review_count} review#{business.review_count < 2 ? '' : 's'}",
             value: business.id }
         end
       else
         begin
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.data.search.total)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         rescue GraphQL::Client::UnfetchedFieldError
-          { name: "#{business.number.to_s.colorize(:light_blue)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
+          { name: "#{business.number.to_s.colorize(:light_cyan)}#{inverse_spaces(business.number, yelp.businesses.length)}| #{business.name.to_s.colorize(:light_white)}#{space_evenly(longest_name(yelp), business.name)} - #{business.rating.to_s.colorize(:light_yellow)} star#{business.rating != 1 ? 's' : ''}",
             value: business.id }
         end
       end
