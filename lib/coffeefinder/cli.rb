@@ -12,7 +12,7 @@ module Coffeefinder
       self.sort_by = options[:sort_by] || DEFAULT_SORT
       self.ip_address = options[:ip_address]
       self.favorites = Favorites.new(FILE_PATH)
-      self.prompt = Prompt.new(options, favorites.list)
+      self.prompt = Prompt.new(options)
       self.table = Table.new(options)
     end
 
@@ -20,7 +20,7 @@ module Coffeefinder
       yelp.clear_searches
       yelp.clear_businesses
       puts LOGO + "\n"
-      choice = prompt.main_menu
+      choice = prompt.main_menu(favorites.list)
       case choice
       when 1
         yelp.strict = true

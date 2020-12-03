@@ -1,14 +1,13 @@
 module Coffeefinder
   class Prompt
     include Formatting
-    attr_reader :prompt, :options, :favorites
-    def initialize(options, favorites)
+    attr_reader :prompt, :options
+    def initialize(options)
       self.prompt = TTY::Prompt.new
       self.options = options
-      self.favorites = favorites
     end
 
-    def main_menu
+    def main_menu(favorites)
       prompt.select('Choose an action:') do |menu|
         menu.default 1
         menu.choice 'Show nearby coffee shops', 1
@@ -116,6 +115,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :prompt, :options, :favorites
+    attr_writer :prompt, :options
   end
 end
