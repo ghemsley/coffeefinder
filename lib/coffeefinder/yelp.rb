@@ -2,7 +2,7 @@ module Coffeefinder
   class Yelp
     include Formatting
     include Queries
-    attr_accessor :latitude, :longitude, :radius, :limit, :sort_by, :offset, :strict, :address
+    attr_accessor :latitude, :longitude, :radius, :limit, :sort_by, :offset, :strict, :address, :id
     attr_reader :variables, :data, :client, :searches, :businesses
     def initialize(args = { latitude: 40.705409778017824,
                             longitude: -74.01392545907245,
@@ -26,7 +26,8 @@ module Coffeefinder
         sort_by: sort_by,
         offset: offset,
         strict: strict,
-        address: address
+        address: address,
+        id: id
       }
     end
 
@@ -39,16 +40,28 @@ module Coffeefinder
       variables[:offset] = offset
       variables[:strict] = strict
       variables[:address] = address
+      variables[:id] = id
     end
 
     def save_search(search)
-      searches.push(search)
+      searches.push(search) unless searches.include?(search)
       searches
+    end
+
+    def save_business(business)
+      businesses.push(business) unless businesses.include?(business)
+      businesses
     end
 
     def clear_searches
       searches.clear
       searches
+    end
+
+    def clear_businesses
+      businesses.clear
+      Business.all.clear
+      businesses
     end
 
     def query(query_type)
@@ -63,6 +76,8 @@ module Coffeefinder
           self.data = client.query(address_query, variables).data
         when 'address_strict'
           self.data = client.query(address_strict_query, variables).data
+        when 'business'
+          self.data = client.query(business_query, variables).data
         end
       rescue Graphlient::Errors::ExecutionError, Graphlient::Errors::FaradayServerError
         puts separator('Please check the options you submitted to the program and run it again, or try again later.')
@@ -85,6 +100,12 @@ module Coffeefinder
     def get_address_query_data
       strict ? query('address_strict') : query('address')
       save_search(data.search)
+      data
+    end
+
+    def get_business_query_data
+      query('business')
+      save_business(data.business)
       data
     end
 

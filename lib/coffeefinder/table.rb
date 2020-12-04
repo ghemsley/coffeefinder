@@ -8,7 +8,7 @@ module Coffeefinder
 
     def search_result_table(yelp, iteration_count)
       table = TTY::Table.new(
-        header: ['Number', 'Name', sort_by_string(options[:sort_by])]
+        header: ['Number'.colorize(:light_green), 'Name'.colorize(:light_green), sort_by_string(options[:sort_by]).colorize(:light_green)]
       )
       yelp_results = yelp.data.search.business.collect { |yelp_business| yelp_business }
       yelp_results.sort_by!(&:distance) if options[:sort_by] == 'distance'
@@ -17,25 +17,25 @@ module Coffeefinder
         business.number = iteration_count + 1
         table << case options[:sort_by]
                  when 'best_match'
-                   { 'Number' => (iteration_count + 1),
-                     'Name' => business.name,
-                     'Rating' => "#{business.rating} stars" }
+                   { 'Number' => (iteration_count + 1).to_s.colorize(:light_cyan),
+                     'Name' => business.name.to_s.colorize(:light_white),
+                     'Rating' => "#{business.rating.to_s.colorize(:light_yellow)} stars" }
                  when 'distance'
-                   { 'Number' => (iteration_count + 1),
-                     'Name' => business.name,
-                     'Distance' => meters_to_miles(business.distance) }
+                   { 'Number' => (iteration_count + 1).to_s.colorize(:light_cyan),
+                     'Name' => business.name.to_s.colorize(:light_white),
+                     'Distance' => meters_to_miles(business.distance).colorize(:light_white) }
                  when 'rating'
-                   { 'Number' => (iteration_count + 1),
-                     'Name' => business.name,
-                     'Rating' => "#{business.rating} stars" }
+                   { 'Number' => (iteration_count + 1).to_s.colorize(:light_cyan),
+                     'Name' => business.name.to_s.colorize(:light_white),
+                     'Rating' => "#{business.rating.to_s.colorize(:light_yellow)} stars" }
                  when 'review_count'
-                   { 'Number' => (iteration_count + 1),
-                     'Name' => business.name,
-                     'Reviews' => "#{business.review_count} reviews" }
+                   { 'Number' => (iteration_count + 1).to_s.colorize(:light_cyan),
+                     'Name' => business.name.to_s.colorize(:light_white),
+                     'Reviews' => "#{business.review_count} reviews".colorize(:light_white) }
                  else
-                   { 'Number' => (iteration_count + 1),
-                     'Name' => business.name,
-                     'Rating' => "#{business.rating} stars" }
+                   { 'Number' => (iteration_count + 1).to_s.colorize(:light_cyan),
+                     'Name' => business.name.colorize(:light_white),
+                     'Rating' => "#{business.rating.to_s.colorize(:light_yellow)} stars" }
                  end
         iteration_count += 1
       end
@@ -48,16 +48,16 @@ module Coffeefinder
 
     def business_table(business)
       table = TTY::Table.new(
-        header: %w[Attribute Value]
+        header: ['Attribute'.colorize(:light_green), 'Value'.colorize(:light_green)]
       )
-      table << { 'Atribute' => 'Name', 'Value' => business.name }
-      table << { 'Atribute' => 'Rating', 'Value' => business.rating }
-      table << { 'Atribute' => 'Reviews', 'Value' => business.review_count }
-      table << { 'Atribute' => 'Distance', 'Value' => meters_to_miles(business.distance) }
-      table << { 'Atribute' => 'Price', 'Value' => business.price }
-      table << { 'Atribute' => 'Address', 'Value' => business.address }
-      table << { 'Atribute' => 'City', 'Value' => business.city }
-      table << { 'Atribute' => 'Open now', 'Value' => business.open_now ? 'Yes' : 'No' }
+      table << { 'Atribute' => 'Name'.colorize(:light_cyan), 'Value' => business.name }
+      table << { 'Atribute' => 'Rating'.colorize(:light_cyan), 'Value' => "#{business.rating.to_s.colorize(:light_yellow)} stars" }
+      table << { 'Atribute' => 'Reviews'.colorize(:light_cyan), 'Value' => business.review_count }
+      table << { 'Atribute' => 'Distance'.colorize(:light_cyan), 'Value' => business.distance.zero? ? 'Unknown'.colorize(:light_red) : meters_to_miles(business.distance).colorize(:light_white) }
+      table << { 'Atribute' => 'Price'.colorize(:light_cyan), 'Value' => business.price }
+      table << { 'Atribute' => 'Address'.colorize(:light_cyan), 'Value' => business.address }
+      table << { 'Atribute' => 'City'.colorize(:light_cyan), 'Value' => business.city }
+      table << { 'Atribute' => 'Open now'.colorize(:light_cyan), 'Value' => business.open_now ? 'Yes'.colorize(:light_green) : 'No'.colorize(:light_red) }
       puts table.render(
         :unicode,
         alignments: %i[left left]

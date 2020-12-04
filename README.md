@@ -2,6 +2,8 @@
 
 A Ruby CLI app for finding local coffee shops and other places that sell coffee
 
+![coffeefinder demo](./coffeefinder.gif)
+
 ## Installation
 
 First, you will need to get an API key from Yelp. 
@@ -31,3 +33,7 @@ Usage: coffeefinder [options]
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/ghemsley/coffeefinder.
+
+## License
+
+[MIT License](./LICENSE)

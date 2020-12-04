@@ -5,20 +5,20 @@ module Coffeefinder
 
     def initialize(business)
       self.id = business.id || SecureRandom.uuid
-      self.name = business.name || 'Unknown'
-      self.rating = business.rating || 'Unknown'
+      self.name = business.name || 'Unknown'.colorize(:light_red)
+      self.rating = business.rating || 'Unknown'.colorize(:light_red)
       self.review_count = business.review_count || 0
       self.distance = business.distance || 0.0
-      self.price = business.price || 'Unknown'
-      self.url = business.url || 'Unknown'
-      self.phone = business.phone || 'Unknown'
+      self.price = business.price.to_s.colorize(:light_green) || 'Unknown'.colorize(:light_red)
+      self.url = business.url || 'Unknown'.colorize(:light_red)
+      self.phone = business.phone || 'Unknown'.colorize(:light_red)
       begin
         self.open_now = business.hours.first.is_open_now
       rescue NoMethodError
         self.open_now = false
       end
-      self.address = business.location.address1 || 'Unknown'
-      self.city = business.location.city || 'Unknown'
+      self.address = business.location.address1 || 'Unknown'.colorize(:light_red)
+      self.city = business.location.city || 'Unknown'.colorize(:light_red)
       self.class.all.push(self)
     end
 
