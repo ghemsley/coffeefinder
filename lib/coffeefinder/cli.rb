@@ -1,8 +1,8 @@
 module Coffeefinder
   class CLI
     include Formatting
-    attr_accessor :geoip, :yelp, :prompt, :parser
-    attr_reader :options, :limit, :radius, :ip_address, :sort_by, :count, :table, :favorites
+    attr_accessor :geoip, :yelp, :prompt, :parser, :favorites
+    attr_reader :options, :limit, :radius, :ip_address, :sort_by, :count, :table
 
     def initialize
       self.parser = Parser.new
@@ -54,6 +54,7 @@ module Coffeefinder
           exit(true)
         else
           clear_favorites
+          main_menu
         end
       when 6
         exit(true)
@@ -191,8 +192,7 @@ module Coffeefinder
 
     def clear_favorites
       favorites.clear if prompt.clear_favorites
-      main_menu
-      nil
+      favorites.list
     end
 
     def remove_favorite(id, businesses)
@@ -220,6 +220,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict, :count, :table, :favorites
+    attr_writer :options, :limit, :radius, :ip_address, :sort_by, :strict, :count, :table
   end
 end

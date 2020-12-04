@@ -1,6 +1,7 @@
 module Coffeefinder
   class Favorites
-    attr_reader :list, :list_hash, :file
+    attr_accessor :file
+    attr_reader :list, :list_hash
 
     def initialize(path)
       self.file = FileIO.new(path)
@@ -42,6 +43,6 @@ module Coffeefinder
 
     private
 
-    attr_writer :list, :list_hash, :file
+    attr_writer :list, :list_hash
   end
 end
