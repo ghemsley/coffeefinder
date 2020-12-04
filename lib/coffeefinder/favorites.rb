@@ -27,7 +27,11 @@ module Coffeefinder
       list.delete(id) if list.include?(id)
       list_hash[:favorites_array] = list
       file.hash = list_hash
-      file.write_json
+      if list.empty?
+        file.delete
+      else
+        file.write_json
+      end
     end
 
     def clear
