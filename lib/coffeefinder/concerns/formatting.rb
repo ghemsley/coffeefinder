@@ -78,7 +78,7 @@ module Coffeefinder
 
     def display_business_url(business)
       puts separator("Url: #{business.url}")
-      puts "Url: #{business.url}".colorize(:light_green)
+      puts "Url: #{business.url}".colorize(:light_white)
       puts separator("Url: #{business.url}")
       nil
     end

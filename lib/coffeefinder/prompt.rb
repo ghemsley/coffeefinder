@@ -91,7 +91,7 @@ module Coffeefinder
       choices.push([{ name: 'Remove a business from favorites', value: 'Remove' },
                     { name: 'Return to the main menu', value: 'Return' },
                     { name: 'Quit', value: 'Quit' }])
-      prompt.select('Choose an action or a business to display info for:', choices, per_page: options[:limit] + 2)
+      prompt.select('Choose an action or a business to display info for:', choices, per_page: options[:limit] + 3)
     end
 
     def clear_favorites
