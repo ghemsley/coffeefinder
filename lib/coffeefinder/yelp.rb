@@ -110,14 +110,14 @@ module Coffeefinder
     end
 
     def searches_to_business_instances
-      last_search_businesses = []
+      last_search_business_results = []
       searches.each do |search|
-        search.business.each do |business|
-          last_search_businesses.push(business)
+        search.business.each do |business_result|
+          last_search_business_results.push(business_result)
         end
       end
-      self.businesses = last_search_businesses.collect do |business|
-        Business.find_or_create_by_id(business)
+      self.businesses = last_search_business_results.collect do |business_result|
+        Business.find_or_create_by_id(business_result)
       end
       businesses
     end

@@ -49,16 +49,17 @@ module Coffeefinder
       end.name
     end
 
-    def longest_distance(yelp)
-      yelp.businesses.max_by do |business|
-        meters_to_miles(business.distance).length
-      end.name
-    end
+    # def longest_distance(yelp)
+    #   yelp.businesses.max_by do |business|
+    #     meters_to_miles(business.distance).length
+    #   end.name
+    # end
 
     def print_all_results_shown
       puts separator('All results shown.')
       puts 'All results shown.'.colorize(:light_green)
       puts separator('All results shown.')
+      nil
     end
 
     def sort_by_string(sort_by)
@@ -165,7 +166,7 @@ module Coffeefinder
       when 'best_match'
         favorites.sort_by!(&:rating).reverse!
       when 'distance'
-        favorites.sort_by!(&:distance).reverse
+        favorites.sort_by!(&:distance)
       when 'rating'
         favorites.sort_by!(&:rating).reverse!
       when 'review_count'

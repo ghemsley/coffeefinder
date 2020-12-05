@@ -17,10 +17,12 @@ module Coffeefinder
       File.open(path, 'w') do |file|
         file.write(JSON.pretty_generate(hash))
       end
+      nil
     end
 
     def delete(path = self.path)
       File.delete(path) if File.exist?(path)
+      nil
     end
   end
 end
