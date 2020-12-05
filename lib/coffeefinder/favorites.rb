@@ -19,6 +19,7 @@ module Coffeefinder
       list_hash[:favorites_array] = list
       file.hash = list_hash
       file.write_json
+      list
     end
 
     def delete_from_list(id)
@@ -39,6 +40,31 @@ module Coffeefinder
       list.clear
       list_hash.clear
       file.delete
+    end
+
+    def save_business(id, yelp)
+      business = yelp.find_business(id)
+      save_to_list(business)
+    end
+
+    def build_favorite_businesses(yelp)
+      list.each do |favorite|
+        yelp.id = favorite
+        yelp.update_variables
+        yelp.get_business_query_data
+      end
+      businesses = yelp.businesses.collect do |business_result|
+        Business.find_or_create_by_id(business_result)
+      end
+      businesses
+    end
+
+    def remove_favorite(id, businesses)
+      delete_from_list(id)
+      businesses.delete_if do |business|
+        business.id == id
+      end
+      list
     end
 
     private

@@ -53,7 +53,7 @@ module Coffeefinder
         if favorites.list.empty?
           exit(true)
         else
-          clear_favorites
+          favorites.clear if prompt.clear_favorites
           main_menu
         end
       when 6
@@ -137,12 +137,6 @@ module Coffeefinder
       nil
     end
 
-    def save_business(id)
-      business = yelp.find_business(id)
-      favorites.save_to_list(business)
-      favorites.list
-    end
-
     def save_business_menu
       yelp.searches_to_business_instances
       choice = prompt.save_business_menu(yelp)
@@ -154,26 +148,14 @@ module Coffeefinder
       else
         display_business(choice)
       end
-      save_business(choice) if prompt.save_business
+      favorites.save_business(choice, yelp) if prompt.save_business
       search_complete_menu
       nil
     end
 
-    def build_favorite_businesses
-      favorites.list.collect do |favorite|
-        yelp.id = favorite
-        yelp.update_variables
-        yelp.get_business_query_data
-      end
-      businesses = yelp.businesses.collect do |business_result|
-        Business.find_or_create_by_id(business_result)
-      end
-      businesses
-    end
-
     def favorites_menu(businesses = nil)
       choice = nil
-      businesses ||= build_favorite_businesses
+      businesses ||= favorites.build_favorite_businesses(yelp)
       while choice != 'Return' && choice != 'Quit'
         choice = prompt.favorites_menu(yelp, businesses)
         case choice
@@ -190,22 +172,8 @@ module Coffeefinder
       nil
     end
 
-    def clear_favorites
-      favorites.clear if prompt.clear_favorites
-      favorites.list
-    end
-
-    def remove_favorite(id, businesses)
-      favorites.delete_from_list(id)
-      businesses.delete_if do |business|
-        business.id == id
-      end
-      main_menu if businesses.empty?
-      nil
-    end
-
     def remove_favorite_menu(businesses = nil)
-      businesses ||= build_favorite_businesses
+      businesses ||= favorites.build_favorite_businesses(yelp)
       choice = prompt.remove_favorite(yelp, businesses)
       case choice
       when 'Return'
@@ -213,7 +181,8 @@ module Coffeefinder
       when 'Quit'
         exit(true)
       else
-        remove_favorite(choice, businesses) if prompt.confirm_remove_favorite
+        favorites.remove_favorite(choice, businesses) if prompt.confirm_remove_favorite
+        main_menu if businesses.empty?
       end
       nil
     end
