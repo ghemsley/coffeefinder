@@ -1,6 +1,6 @@
 # Coffeefinder
 
-A Ruby CLI app for finding local coffee shops and other places that sell coffee
+A Ruby CLI app for finding nearby coffee shops and other places that sell coffee
 
 ![coffeefinder demo](./coffeefinder.gif)
 
@@ -14,7 +14,9 @@ Once those are done, go to 'Manage app' and join the developer beta to gain acce
 
 Save that key somewhere safe using a text editor, then in your terminal type `export YELP_API_KEY=your_api_key_goes_here`.
 
-Next, using your terminal in the coffeefinder project directory root, run the command `./bin/setup`, followed by `bundle exec rake install`.
+Clone this respitory (if you don't know how [there are some instructions here](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository)) and then `cd` into the directory created by the cloning process.
+
+Next, in the coffeefinder project directory root, run the command `./bin/setup` to install dependencies, followed by `bundle exec rake install` to install the program as a gem.
 
 Now you should be ready to run Coffeefinder!
 
@@ -30,6 +32,11 @@ Usage: coffeefinder [options]
     -v, --version                    Display the program version
     -h, --help                       Display a helpful usage guide
 ```
+
+Launching the program without options works too; it will use the default radius, sorting method, and results limit and will lookup your location using your public IP address.
+
+Once launched, the program can search for and display coffee shops/other businesses that sell coffee. By default the program guesses your location using a geoIP lookup service, or you can search by address. You can also optionally save results to a favorites list for easy reference later. The favorites list will be saved in the file `~/.coffeefinder.json`. Deleting or clearing all your favorites will get rid of the file for you automatically.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/ghemsley/coffeefinder.
